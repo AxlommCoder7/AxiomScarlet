@@ -64,7 +64,7 @@ async def calculate_math(client, message: Message):
     await message.reply_text(response, quote=True)
 
 ###
-@app.on_message(filters.command("leavegroup", "babygo", "bbugo", "maanavgo", "axiomgo")& filters.user(OWNER_ID))
+@app.on_message(filters.command(["leavegroup", "babygo", "bbugo", "maanavgo", "axiomgo"])& filters.user(OWNER_ID))
 async def bot_leave(_, message):
     chat_id = message.chat.id
     text = f"sᴜᴄᴄᴇssғᴜʟʟʏ   ʟᴇғᴛ  !!."
