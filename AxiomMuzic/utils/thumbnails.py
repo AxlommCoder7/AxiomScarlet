@@ -23,13 +23,13 @@ from config import YOUTUBE_IMG_URL
 CACHE_DIR = "cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-PANEL_W, PANEL_H = 930, 430
+PANEL_W, PANEL_H = 980, 470
 PANEL_X = (1280 - PANEL_W) // 2
 PANEL_Y = 135
 
-THUMB_W, THUMB_H = 310, 310
+THUMB_W, THUMB_H = 340, 340
 THUMB_X = PANEL_X + 35
-THUMB_Y = PANEL_Y + 50
+THUMB_Y = PANEL_Y + 65
 
 TITLE_X = THUMB_X + THUMB_W + 35
 TITLE_Y = THUMB_Y + 10
@@ -114,7 +114,7 @@ async def get_thumb(videoid: str) -> str:
     glass = Image.new(
         "RGBA",
         (PANEL_W, PANEL_H),
-        (22,22,22,55)
+        (18,18,18,40)
     )
     
     panel = Image.alpha_composite(panel, glass)
@@ -142,51 +142,26 @@ async def get_thumb(videoid: str) -> str:
         (180,0,255),
     ]
     
-    rgb_colors = sample(palette, 4)
+    rgb_colors = sample(palette, 6)
     
     glow_layer = Image.new("RGBA", bg.size, (0,0,0,0))
     gdraw = ImageDraw.Draw(glow_layer)
     
-    # TOP
-    gdraw.line(
-        [(PANEL_X+40, PANEL_Y),
-         (PANEL_X+PANEL_W//2, PANEL_Y)],
-        fill=rgb_colors[0] + (255,),
-        width=5
-    )
+    for size in [0, 3, 6, 9]:
     
-    gdraw.line(
-        [(PANEL_X+PANEL_W//2, PANEL_Y),
-         (PANEL_X+PANEL_W-40, PANEL_Y)],
-        fill=rgb_colors[1] + (255,),
-        width=5
-    )
+        gdraw.rounded_rectangle(
+            (
+                PANEL_X-size,
+                PANEL_Y-size,
+                PANEL_X+PANEL_W+size,
+                PANEL_Y+PANEL_H+size
+            ),
+            radius=45,
+            outline=rgb_colors[0] + (180,),
+            width=2
+        )
     
-    # RIGHT
-    gdraw.line(
-        [(PANEL_X+PANEL_W, PANEL_Y+30),
-         (PANEL_X+PANEL_W, PANEL_Y+PANEL_H-30)],
-        fill=rgb_colors[2] + (255,),
-        width=5
-    )
-    
-    # BOTTOM
-    gdraw.line(
-        [(PANEL_X+40, PANEL_Y+PANEL_H),
-         (PANEL_X+PANEL_W-40, PANEL_Y+PANEL_H)],
-        fill=rgb_colors[3] + (255,),
-        width=5
-    )
-    
-    # LEFT
-    gdraw.line(
-        [(PANEL_X, PANEL_Y+30),
-         (PANEL_X, PANEL_Y+PANEL_H-30)],
-        fill=rgb_colors[0] + (255,),
-        width=5
-    )
-    
-    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(14))
+    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(25))
     bg = Image.alpha_composite(bg, glow_layer)
     
     thumb = Image.open(thumb_path).convert("RGBA")
@@ -216,7 +191,8 @@ async def get_thumb(videoid: str) -> str:
     
     thumb_colors = sample(palette, 4)
     
-    for i in range(3):
+    for i in [0,4,8,12]:
+    
         tdraw.rounded_rectangle(
             (
                 THUMB_X-i,
@@ -224,12 +200,12 @@ async def get_thumb(videoid: str) -> str:
                 THUMB_X+THUMB_W+i,
                 THUMB_Y+THUMB_H+i
             ),
-            radius=32,
-            outline=thumb_colors[i % 4] + (255,),
+            radius=38,
+            outline=thumb_colors[i % len(thumb_colors)] + (220,),
             width=3
         )
     
-    thumb_glow = thumb_glow.filter(ImageFilter.GaussianBlur(10))
+    thumb_glow = thumb_glow.filter(ImageFilter.GaussianBlur(20))
     bg = Image.alpha_composite(bg, thumb_glow)
     
     bg.paste(thumb, (THUMB_X, THUMB_Y), tmask)
