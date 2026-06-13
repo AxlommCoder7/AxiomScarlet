@@ -23,15 +23,15 @@ from config import YOUTUBE_IMG_URL
 CACHE_DIR = "cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-PANEL_W, PANEL_H = 880, 390
+PANEL_W, PANEL_H = 930, 430
 PANEL_X = (1280 - PANEL_W) // 2
-PANEL_Y = 145
+PANEL_Y = 135
 
-THUMB_W, THUMB_H = 280, 280
+THUMB_W, THUMB_H = 310, 310
 THUMB_X = PANEL_X + 35
-THUMB_Y = PANEL_Y + 60
+THUMB_Y = PANEL_Y + 50
 
-TITLE_X = THUMB_X + THUMB_W + 30
+TITLE_X = THUMB_X + THUMB_W + 35
 TITLE_Y = THUMB_Y + 10
 
 META_X = TITLE_X
@@ -46,7 +46,7 @@ ICONS_W, ICONS_H = 320, 38
 ICONS_X = TITLE_X + 40
 ICONS_Y = BAR_Y + 70
 
-MAX_TITLE_WIDTH = 420
+MAX_TITLE_WIDTH = 440
 
 def trim_to_width(text: str, font: ImageFont.FreeTypeFont, max_w: int) -> str:
     ellipsis = "…"
@@ -109,12 +109,12 @@ async def get_thumb(videoid: str) -> str:
         )
     )
     
-    panel = panel.filter(ImageFilter.GaussianBlur(3))
+    panel = panel.filter(ImageFilter.GaussianBlur(2))
     
     glass = Image.new(
         "RGBA",
         (PANEL_W, PANEL_H),
-        (18, 18, 18, 65),
+        (22,22,22,55)
     )
     
     panel = Image.alpha_composite(panel, glass)
@@ -128,7 +128,67 @@ async def get_thumb(videoid: str) -> str:
     )
     
     bg.paste(panel, (PANEL_X, PANEL_Y), mask)
-
+    
+    from random import sample
+    
+    palette = [
+        (0,255,255),
+        (0,255,120),
+        (255,0,200),
+        (255,180,0),
+        (120,120,255),
+        (255,80,80),
+        (0,180,255),
+        (180,0,255),
+    ]
+    
+    rgb_colors = sample(palette, 4)
+    
+    glow_layer = Image.new("RGBA", bg.size, (0,0,0,0))
+    gdraw = ImageDraw.Draw(glow_layer)
+    
+    # TOP
+    gdraw.line(
+        [(PANEL_X+40, PANEL_Y),
+         (PANEL_X+PANEL_W//2, PANEL_Y)],
+        fill=rgb_colors[0] + (255,),
+        width=5
+    )
+    
+    gdraw.line(
+        [(PANEL_X+PANEL_W//2, PANEL_Y),
+         (PANEL_X+PANEL_W-40, PANEL_Y)],
+        fill=rgb_colors[1] + (255,),
+        width=5
+    )
+    
+    # RIGHT
+    gdraw.line(
+        [(PANEL_X+PANEL_W, PANEL_Y+30),
+         (PANEL_X+PANEL_W, PANEL_Y+PANEL_H-30)],
+        fill=rgb_colors[2] + (255,),
+        width=5
+    )
+    
+    # BOTTOM
+    gdraw.line(
+        [(PANEL_X+40, PANEL_Y+PANEL_H),
+         (PANEL_X+PANEL_W-40, PANEL_Y+PANEL_H)],
+        fill=rgb_colors[3] + (255,),
+        width=5
+    )
+    
+    # LEFT
+    gdraw.line(
+        [(PANEL_X, PANEL_Y+30),
+         (PANEL_X, PANEL_Y+PANEL_H-30)],
+        fill=rgb_colors[0] + (255,),
+        width=5
+    )
+    
+    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(14))
+    bg = Image.alpha_composite(bg, glow_layer)
+    
     thumb = Image.open(thumb_path).convert("RGBA")
     thumb = thumb.resize((THUMB_W, THUMB_H), Image.LANCZOS)
     tmask = Image.new("L", thumb.size, 0)
@@ -150,6 +210,27 @@ async def get_thumb(videoid: str) -> str:
     
     shadow = shadow.filter(ImageFilter.GaussianBlur(15))
     bg = Image.alpha_composite(bg, shadow)
+
+    thumb_glow = Image.new("RGBA", bg.size, (0,0,0,0))
+    tdraw = ImageDraw.Draw(thumb_glow)
+    
+    thumb_colors = sample(palette, 4)
+    
+    for i in range(3):
+        tdraw.rounded_rectangle(
+            (
+                THUMB_X-i,
+                THUMB_Y-i,
+                THUMB_X+THUMB_W+i,
+                THUMB_Y+THUMB_H+i
+            ),
+            radius=32,
+            outline=thumb_colors[i % 4] + (255,),
+            width=3
+        )
+    
+    thumb_glow = thumb_glow.filter(ImageFilter.GaussianBlur(10))
+    bg = Image.alpha_composite(bg, thumb_glow)
     
     bg.paste(thumb, (THUMB_X, THUMB_Y), tmask)
 
