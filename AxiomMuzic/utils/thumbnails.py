@@ -32,13 +32,13 @@ THUMB_X = PANEL_X + 35
 THUMB_Y = PANEL_Y + 60
 
 TITLE_X = THUMB_X + THUMB_W + 30
-TITLE_Y = THUMB_Y + 20
+TITLE_Y = THUMB_Y + 10
 
 META_X = TITLE_X
-META_Y = TITLE_Y + 60
+META_Y = TITLE_Y + 55
 
 BAR_X = TITLE_X
-BAR_Y = META_Y + 70
+BAR_Y = META_Y + 55
 BAR_TOTAL_LEN = 420
 BAR_RED_LEN = 240
 
@@ -114,7 +114,7 @@ async def get_thumb(videoid: str) -> str:
     glass = Image.new(
         "RGBA",
         (PANEL_W, PANEL_H),
-        (15, 15, 15, 85),
+        (18, 18, 18, 65),
     )
     
     panel = Image.alpha_composite(panel, glass)
@@ -123,19 +123,11 @@ async def get_thumb(videoid: str) -> str:
     
     ImageDraw.Draw(mask).rounded_rectangle(
         (0, 0, PANEL_W, PANEL_H),
-        radius=35,
+        radius=42,
         fill=255,
     )
     
     bg.paste(panel, (PANEL_X, PANEL_Y), mask)
-
-    # Draw details
-    draw = ImageDraw.Draw(bg)
-    try:
-        title_font = ImageFont.truetype("AxiomMuzic/assets/assets/font2.ttf", 36)
-        regular_font = ImageFont.truetype("AxiomMuzic/assets/assets/font.ttf", 22)
-    except OSError:
-        title_font = regular_font = ImageFont.load_default()
 
     thumb = Image.open(thumb_path).convert("RGBA")
     thumb = thumb.resize((THUMB_W, THUMB_H), Image.LANCZOS)
@@ -161,6 +153,14 @@ async def get_thumb(videoid: str) -> str:
     
     bg.paste(thumb, (THUMB_X, THUMB_Y), tmask)
 
+    # Draw details
+    draw = ImageDraw.Draw(bg)
+    try:
+        title_font = ImageFont.truetype("AxiomMuzic/assets/assets/font2.ttf", 36)
+        regular_font = ImageFont.truetype("AxiomMuzic/assets/assets/font.ttf", 22)
+    except OSError:
+        title_font = regular_font = ImageFont.load_default()
+
     draw.text((TITLE_X, TITLE_Y), trim_to_width(title, title_font, MAX_TITLE_WIDTH), fill="white", font=title_font)
     draw.text((META_X, META_Y), f"YouTube | {views}", fill=(220,220,220), font=regular_font)
 
@@ -173,7 +173,7 @@ async def get_thumb(videoid: str) -> str:
     
     draw.line(
         [(BAR_X, BAR_Y), (BAR_X + BAR_RED_LEN, BAR_Y)],
-        fill=(80,255,120),
+        fill=(0,210,140),
         width=7,
     )
     
@@ -189,7 +189,7 @@ async def get_thumb(videoid: str) -> str:
 
     draw.text((BAR_X, BAR_Y + 15), "01:13", fill="white", font=regular_font)
     end_text = "Live" if is_live else duration_text
-    draw.text((BAR_X + BAR_TOTAL_LEN - (90 if is_live else 30), BAR_Y + 15), end_text, fill=(255,80,80) if is_live else "white", font=regular_font)
+    draw.text((BAR_X + BAR_TOTAL_LEN - (90 if is_live else 30), BAR_Y + 15), end_text, fill=(0,210,140) if is_live else "white", font=regular_font)
 
     # Icons
     icons_path = "AxiomMuzic/assets/assets/play_icons.png"
