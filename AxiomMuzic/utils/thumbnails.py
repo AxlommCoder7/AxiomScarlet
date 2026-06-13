@@ -58,7 +58,7 @@ def trim_to_width(text: str, font: ImageFont.FreeTypeFont, max_w: int) -> str:
     return ellipsis
 
 async def get_thumb(videoid: str) -> str:
-    cache_path = os.path.join(CACHE_DIR, f"{videoid}_v4.png")
+    cache_path = os.path.join(CACHE_DIR, f"{videoid}_v5.png")
     if os.path.exists(cache_path):
         return cache_path
 
@@ -142,24 +142,26 @@ async def get_thumb(videoid: str) -> str:
         (180,0,255),
     ]
     
-    rgb_colors = sample(palette, 6)
+    card_glow = Image.new("RGBA", bg.size, (0,0,0,0))
+    cg = ImageDraw.Draw(card_glow)
     
-    glow_layer = Image.new("RGBA", bg.size, (0,0,0,0))
-    gdraw = ImageDraw.Draw(glow_layer)
+    card_colors = sample(palette, 4)
     
-    for size in [0, 3, 6, 9]:
-    
-        gdraw.rounded_rectangle(
+    for spread in [0,5,10,15,20]:
+        cg.rounded_rectangle(
             (
-                PANEL_X-size,
-                PANEL_Y-size,
-                PANEL_X+PANEL_W+size,
-                PANEL_Y+PANEL_H+size
+                PANEL_X-spread,
+                PANEL_Y-spread,
+                PANEL_X+PANEL_W+spread,
+                PANEL_Y+PANEL_H+spread
             ),
-            radius=45,
-            outline=rgb_colors[0] + (180,),
-            width=2
+            radius=55,
+            outline=card_colors[spread % 4] + (255,),
+            width=6
         )
+    
+    card_glow = card_glow.filter(ImageFilter.GaussianBlur(35))
+    bg = Image.alpha_composite(bg, card_glow)
     
     glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(25))
     bg = Image.alpha_composite(bg, glow_layer)
@@ -187,25 +189,24 @@ async def get_thumb(videoid: str) -> str:
     bg = Image.alpha_composite(bg, shadow)
 
     thumb_glow = Image.new("RGBA", bg.size, (0,0,0,0))
-    tdraw = ImageDraw.Draw(thumb_glow)
+    tg = ImageDraw.Draw(thumb_glow)
     
     thumb_colors = sample(palette, 4)
     
-    for i in [0,4,8,12]:
-    
-        tdraw.rounded_rectangle(
+    for idx, spread in enumerate([0,4,8,12,16]):
+        tg.rounded_rectangle(
             (
-                THUMB_X-i,
-                THUMB_Y-i,
-                THUMB_X+THUMB_W+i,
-                THUMB_Y+THUMB_H+i
+                THUMB_X-spread,
+                THUMB_Y-spread,
+                THUMB_X+THUMB_W+spread,
+                THUMB_Y+THUMB_H+spread
             ),
-            radius=38,
-            outline=thumb_colors[i % len(thumb_colors)] + (220,),
-            width=3
+            radius=40,
+            outline=thumb_colors[idx % len(thumb_colors)] + (255,),
+            width=5
         )
     
-    thumb_glow = thumb_glow.filter(ImageFilter.GaussianBlur(20))
+    thumb_glow = thumb_glow.filter(ImageFilter.GaussianBlur(30))
     bg = Image.alpha_composite(bg, thumb_glow)
     
     bg.paste(thumb, (THUMB_X, THUMB_Y), tmask)
