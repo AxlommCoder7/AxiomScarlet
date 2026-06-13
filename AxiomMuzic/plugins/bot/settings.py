@@ -16,7 +16,7 @@ import random
 from pyrogram import filters
 import asyncio
 from time import time, strftime, gmtime
-from pyrogram.enums import ChatType
+from pyrogram.enums import ChatMemberStatus, ChatType
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import (
     CallbackQuery,
