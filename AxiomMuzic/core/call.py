@@ -267,12 +267,12 @@ class Call(PyTgCalls):
         await self._play_on_assistant(assistant, chat_id, stream)
 
     async def stream_call(self, link):
-        assistant = await group_assistant(self, config.LOG_GROUP_ID)
+        assistant = await group_assistant(self, config.LOGGER_ID)
         stream = self._build_stream(link, video=True)
-        await self._play_on_assistant(assistant, config.LOG_GROUP_ID, stream)
+        await self._play_on_assistant(assistant, config.LOGGER_ID, stream)
         await asyncio.sleep(0.2)
         try:
-            await assistant.leave_call(config.LOG_GROUP_ID, close=False)
+            await assistant.leave_call(config.LOGGER_ID, close=False)
         except Exception:
             pass
 
