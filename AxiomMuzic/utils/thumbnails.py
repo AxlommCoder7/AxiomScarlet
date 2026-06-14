@@ -1,5 +1,5 @@
 # -----------------------------------------------
-# 🔸 AxiomMusic Project - Clean Thumbnail Generator
+# 🔸 AxiomMusic Project - Perfect Thumbnail Generator
 # 🔹 Developed & Maintained by: Axiom Bots (https://t.me/axiombots)
 # 📅 Copyright © 2026 – All Rights Reserved
 # -----------------------------------------------
@@ -12,44 +12,41 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageEnhance
 from py_yt import VideosSearch
 from config import YOUTUBE_IMG_URL
 
-# Constants
 CACHE_DIR = "cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-# Panel dimensions - Match sample exactly
-PANEL_W, PANEL_H = 950, 450
+# Panel dimensions - EXACT from sample
+PANEL_W, PANEL_H = 920, 440
 PANEL_X = (1280 - PANEL_W) // 2
-PANEL_Y = 135
-PANEL_RADIUS = 50  # More curved corners
+PANEL_Y = 140
+PANEL_RADIUS = 45
 
-# Thumbnail dimensions
-THUMB_SIZE = 320
-THUMB_X = PANEL_X + 50
-THUMB_Y = PANEL_Y + 65
-THUMB_RADIUS = 30
+# Thumbnail
+THUMB_SIZE = 310
+THUMB_X = PANEL_X + 45
+THUMB_Y = PANEL_Y + 60
+THUMB_RADIUS = 28
 
 # Text positions
-TITLE_X = THUMB_X + THUMB_SIZE + 55
-TITLE_Y = THUMB_Y + 25
-META_Y = TITLE_Y + 55
+TITLE_X = THUMB_X + THUMB_SIZE + 50
+TITLE_Y = THUMB_Y + 35
+META_Y = TITLE_Y + 50
 
 # Progress bar
-BAR_Y = META_Y + 65
+BAR_Y = META_Y + 60
 BAR_X = TITLE_X
-BAR_WIDTH = 480
+BAR_WIDTH = 460
 BAR_HEIGHT = 5
 
-# Icons position
+# Icons
 ICONS_Y = BAR_Y + 45
 ICONS_X = TITLE_X
 
-MAX_TITLE_WIDTH = 500
+MAX_TITLE_WIDTH = 480
 
 def trim_text(text: str, font: ImageFont.FreeTypeFont, max_width: int) -> str:
-    """Trim text to fit within max_width"""
     if font.getlength(text) <= max_width:
         return text
-    
     ellipsis = "…"
     for i in range(len(text) - 1, 0, -1):
         trimmed = text[:i] + ellipsis
@@ -57,37 +54,12 @@ def trim_text(text: str, font: ImageFont.FreeTypeFont, max_width: int) -> str:
             return trimmed
     return ellipsis
 
-def create_smooth_gradient_border(panel_size, colors, border_width=8, blur_radius=30):
-    """Create smooth multi-color gradient border"""
-    width, height = panel_size
-    img = Image.new("RGBA", (width + border_width * 4, height + border_width * 4), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    
-    # Create smooth gradient layers
-    for i, color in enumerate(colors):
-        offset = i * 3
-        alpha = 200 - (i * 40)
-        if alpha < 80:
-            alpha = 80
-        
-        draw.rounded_rectangle(
-            (offset, offset, width + border_width * 4 - offset, height + border_width * 4 - offset),
-            radius=PANEL_RADIUS + offset + 5,
-            outline=color + (alpha,),
-            width=border_width
-        )
-    
-    # Apply gaussian blur for smooth glow
-    return img.filter(ImageFilter.GaussianBlur(blur_radius))
-
 async def get_thumb(videoid: str) -> str:
-    """Generate clean, professional thumbnail"""
-    cache_path = os.path.join(CACHE_DIR, f"{videoid}_clean.png")
+    cache_path = os.path.join(CACHE_DIR, f"{videoid}_perfect.png")
     
     if os.path.exists(cache_path):
         return cache_path
 
-    # Fetch video data
     thumb_path = os.path.join(CACHE_DIR, f"thumb_{videoid}.png")
     
     try:
@@ -113,7 +85,6 @@ async def get_thumb(videoid: str) -> str:
     is_live = not duration or str(duration).strip().lower() in {"", "live", "live now"}
     duration_text = "LIVE" if is_live else (duration or "Unknown")
 
-    # Download thumbnail
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail_url, timeout=10) as resp:
@@ -126,103 +97,132 @@ async def get_thumb(videoid: str) -> str:
         return YOUTUBE_IMG_URL
 
     try:
-        # Open and resize thumbnail
+        # Open thumbnail
         base_thumb = Image.open(thumb_path).convert("RGBA")
         base_thumb = base_thumb.resize((1280, 720), Image.LANCZOS)
         
-        # ENHANCE BRIGHTNESS - Make it brighter
+        # BRIGHTNESS - Make it brighter like sample
         enhancer = ImageEnhance.Brightness(base_thumb)
-        base_thumb = enhancer.enhance(1.3)  # 30% brighter
+        base_thumb = enhancer.enhance(1.35)
         
-        # ENHANCE CONTRAST
         enhancer = ImageEnhance.Contrast(base_thumb)
-        base_thumb = enhancer.enhance(1.2)  # 20% more contrast
+        base_thumb = enhancer.enhance(1.15)
         
-        # Apply blur to background
-        bg = base_thumb.filter(ImageFilter.GaussianBlur(15))
+        # Blur background
+        bg = base_thumb.filter(ImageFilter.GaussianBlur(18))
         
-        # Darken background slightly
-        dark_overlay = Image.new("RGBA", bg.size, (0, 0, 0, 80))
+        # Dark overlay
+        dark_overlay = Image.new("RGBA", bg.size, (0, 0, 0, 75))
         bg = Image.alpha_composite(bg, dark_overlay)
         
-        # Create frosted glass panel - CLEAN & SIMPLE
+        # Create panel area
         panel_area = bg.crop((PANEL_X, PANEL_Y, PANEL_X + PANEL_W, PANEL_Y + PANEL_H))
         
-        # Light frosted effect
-        frosted = Image.new("RGBA", (PANEL_W, PANEL_H), (20, 20, 20, 50))
+        # Frosted glass effect - SUBTLE like sample
+        frosted = Image.new("RGBA", (PANEL_W, PANEL_H), (15, 15, 15, 45))
         panel = Image.alpha_composite(panel_area, frosted)
-        panel = panel.filter(ImageFilter.GaussianBlur(2))
+        panel = panel.filter(ImageFilter.GaussianBlur(1.5))
         
-        # Create rounded mask with HIGH RADIUS
+        # Rounded mask
         mask = Image.new("L", (PANEL_W, PANEL_H), 0)
         mask_draw = ImageDraw.Draw(mask)
         mask_draw.rounded_rectangle((0, 0, PANEL_W, PANEL_H), radius=PANEL_RADIUS, fill=255)
         
-        # Paste panel with mask
         bg.paste(panel, (PANEL_X, PANEL_Y), mask)
         
-        # GRADIENT BORDER - Smooth and subtle
-        gradient_colors = [
-            (0, 255, 200),    # Teal
-            (0, 200, 255),    # Cyan
-            (100, 150, 255),  # Blue
+        # MULTI-COLOR GRADIENT BORDER - EXACT like sample
+        # Colors: Blue -> Green -> Pink/Purple gradient
+        border_colors = [
+            (40, 100, 255),    # Blue
+            (40, 220, 120),    # Green
+            (200, 80, 200),    # Purple/Pink
+            (255, 120, 100),   # Orange-Pink
         ]
         
-        border_glow = create_smooth_gradient_border(
-            (PANEL_W, PANEL_H),
-            gradient_colors,
-            border_width=6,
-            blur_radius=35
-        )
+        # Create glowing border
+        border_size = (PANEL_W + 60, PANEL_H + 60)
+        border_img = Image.new("RGBA", border_size, (0, 0, 0, 0))
+        border_draw = ImageDraw.Draw(border_img)
         
-        bg.paste(border_glow, (PANEL_X - 12, PANEL_Y - 12), border_glow)
+        # Multiple layers for smooth glow
+        for i, color in enumerate(border_colors):
+            offset = i * 5
+            alpha = 220 - (i * 45)
+            if alpha < 100:
+                alpha = 100
+            
+            border_draw.rounded_rectangle(
+                (offset, offset, border_size[0] - offset, border_size[1] - offset),
+                radius=PANEL_RADIUS + offset + 8,
+                outline=color + (alpha,),
+                width=7
+            )
+        
+        # Blur for glow effect
+        border_img = border_img.filter(ImageFilter.GaussianBlur(32))
+        
+        # Paste border
+        bg.paste(border_img, (PANEL_X - 30, PANEL_Y - 30), border_img)
+        
+        # Inner border (sharp)
+        inner_border = Image.new("RGBA", (PANEL_W + 8, PANEL_H + 8), (0, 0, 0, 0))
+        ib_draw = ImageDraw.Draw(inner_border)
+        ib_draw.rounded_rectangle(
+            (0, 0, PANEL_W + 8, PANEL_H + 8),
+            radius=PANEL_RADIUS + 4,
+            outline=(255, 255, 255, 40),
+            width=2
+        )
+        bg.paste(inner_border, (PANEL_X - 4, PANEL_Y - 4), inner_border)
         
         # Process thumbnail
         thumb_img = Image.open(thumb_path).convert("RGBA")
         thumb_img = thumb_img.resize((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
         
-        # ENHANCE thumbnail brightness too
+        # Brightness for thumb
         enhancer = ImageEnhance.Brightness(thumb_img)
         thumb_img = enhancer.enhance(1.2)
         
-        # Create rounded mask for thumbnail
+        # Thumbnail mask
         thumb_mask = Image.new("L", (THUMB_SIZE, THUMB_SIZE), 0)
         mask_draw = ImageDraw.Draw(thumb_mask)
         mask_draw.rounded_rectangle((0, 0, THUMB_SIZE, THUMB_SIZE), radius=THUMB_RADIUS, fill=255)
         
-        # Add subtle shadow
+        # Thumbnail shadow
         shadow = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
         shadow_draw = ImageDraw.Draw(shadow)
         shadow_draw.rounded_rectangle(
-            (THUMB_X - 4, THUMB_Y - 4, 
-             THUMB_X + THUMB_SIZE + 4, THUMB_Y + THUMB_SIZE + 4),
-            radius=THUMB_RADIUS + 5,
-            fill=(0, 0, 0, 100)
+            (THUMB_X - 5, THUMB_Y - 5, 
+             THUMB_X + THUMB_SIZE + 5, THUMB_Y + THUMB_SIZE + 5),
+            radius=THUMB_RADIUS + 6,
+            fill=(0, 0, 0, 120)
         )
-        shadow = shadow.filter(ImageFilter.GaussianBlur(12))
+        shadow = shadow.filter(ImageFilter.GaussianBlur(15))
         bg = Image.alpha_composite(bg, shadow)
         
-        # Thumbnail glow border
-        thumb_glow_colors = [
-            (0, 255, 200),
-            (0, 220, 255),
+        # Thumbnail glow border - MULTI COLOR
+        thumb_border_size = (THUMB_SIZE + 30, THUMB_SIZE + 30)
+        thumb_border = Image.new("RGBA", thumb_border_size, (0, 0, 0, 0))
+        tb_draw = ImageDraw.Draw(thumb_border)
+        
+        thumb_colors = [
+            (60, 120, 255),    # Blue
+            (60, 230, 130),    # Green
+            (180, 100, 220),   # Purple
         ]
         
-        thumb_glow = Image.new("RGBA", (THUMB_SIZE + 24, THUMB_SIZE + 24), (0, 0, 0, 0))
-        tg_draw = ImageDraw.Draw(thumb_glow)
-        
-        for i, color in enumerate(thumb_glow_colors):
+        for i, color in enumerate(thumb_colors):
             offset = i * 4
             alpha = 200 - (i * 50)
-            tg_draw.rounded_rectangle(
-                (offset, offset, THUMB_SIZE + 24 - offset, THUMB_SIZE + 24 - offset),
-                radius=THUMB_RADIUS + offset + 3,
+            tb_draw.rounded_rectangle(
+                (offset, offset, thumb_border_size[0] - offset, thumb_border_size[1] - offset),
+                radius=THUMB_RADIUS + offset + 5,
                 outline=color + (alpha,),
-                width=4
+                width=5
             )
         
-        thumb_glow = thumb_glow.filter(ImageFilter.GaussianBlur(20))
-        bg.paste(thumb_glow, (THUMB_X - 12, THUMB_Y - 12), thumb_glow)
+        thumb_border = thumb_border.filter(ImageFilter.GaussianBlur(22))
+        bg.paste(thumb_border, (THUMB_X - 15, THUMB_Y - 15), thumb_border)
         
         # Paste thumbnail
         bg.paste(thumb_img, (THUMB_X, THUMB_Y), thumb_mask)
@@ -230,96 +230,102 @@ async def get_thumb(videoid: str) -> str:
         # Drawing
         draw = ImageDraw.Draw(bg)
         
-        # Load fonts
+        # Fonts
         try:
-            title_font = ImageFont.truetype("AxiomMuzic/assets/assets/font2.ttf", 36)
-            meta_font = ImageFont.truetype("AxiomMuzic/assets/assets/font.ttf", 22)
-            time_font = ImageFont.truetype("AxiomMuzic/assets/assets/font.ttf", 19)
+            title_font = ImageFont.truetype("AxiomMuzic/assets/assets/font2.ttf", 38)
+            meta_font = ImageFont.truetype("AxiomMuzic/assets/assets/font.ttf", 23)
+            time_font = ImageFont.truetype("AxiomMuzic/assets/assets/font.ttf", 20)
         except OSError:
             title_font = ImageFont.load_default()
             meta_font = title_font
             time_font = title_font
         
-        # Draw title - CLEAN
-        trimmed_title = trim_text(title, title_font, MAX_TITLE_WIDTH)
+        # Title - UPPERCASE like sample
+        trimmed_title = trim_text(title.upper(), title_font, MAX_TITLE_WIDTH)
         draw.text((TITLE_X, TITLE_Y), trimmed_title, fill="white", font=title_font)
         
-        # Draw channel/views
-        meta_text = f"{channel} | {views}"
-        draw.text((TITLE_X, META_Y), meta_text, fill=(210, 210, 210), font=meta_font)
+        # Channel name
+        draw.text((TITLE_X, META_Y), channel, fill=(220, 220, 220), font=meta_font)
         
-        # Progress bar - CLEAN & SIMPLE
+        # Progress bar
         bar_end_x = BAR_X + BAR_WIDTH
-        progress_percent = 0.30  # 30% - adjust as needed
-        progress_width = int(BAR_WIDTH * progress_percent)
+        progress_width = int(BAR_WIDTH * 0.35)
         
-        # Bar background
+        # Bar background - gray
         draw.rounded_rectangle(
             [(BAR_X, BAR_Y), (bar_end_x, BAR_Y + BAR_HEIGHT)],
             radius=3,
-            fill=(70, 70, 70)
+            fill=(90, 90, 90)
         )
         
-        # Progress fill - BRIGHT GREEN
+        # Progress - BRIGHT GREEN like sample
         draw.rounded_rectangle(
             [(BAR_X, BAR_Y), (BAR_X + progress_width, BAR_Y + BAR_HEIGHT)],
             radius=3,
-            fill=(0, 230, 140)
+            fill=(80, 240, 100)
         )
         
-        # Progress circle
+        # Circle indicator
         circle_x = BAR_X + progress_width
         circle_y = BAR_Y + BAR_HEIGHT // 2
         draw.ellipse(
-            [(circle_x - 6, circle_y - 6), (circle_x + 6, circle_y + 6)],
+            [(circle_x - 7, circle_y - 7), (circle_x + 7, circle_y + 7)],
             fill="white"
         )
         
-        # Time text
-        current_time = "01:13"
+        # Times
+        current_time = "01:58"
+        total_time = duration_text if not is_live else "4:49"
+        
         draw.text((BAR_X, BAR_Y + 22), current_time, fill="white", font=time_font)
+        draw.text((bar_end_x - 40, BAR_Y + 22), total_time, fill="white", font=time_font)
         
-        end_time_x = bar_end_x - (50 if is_live else 40)
-        end_color = (0, 230, 140) if is_live else "white"
-        draw.text((end_time_x, BAR_Y + 22), duration_text, fill=end_color, font=time_font)
-        
-        # Control icons - SIMPLE & CLEAN
-        icon_color = "white"
-        icon_gap = 38
+        # CONTROL ICONS - EXACT like sample
         icon_y = ICONS_Y
+        icon_spacing = 35
+        start_x = ICONS_X
         
-        # Previous
-        draw.polygon([(ICONS_X, icon_y+6), (ICONS_X, icon_y+22), (ICONS_X+18, icon_y+14)], fill=icon_color)
-        draw.rectangle([(ICONS_X+20, icon_y+4), (ICONS_X+24, icon_y+24)], fill=icon_color)
+        # 1. Shuffle icon - GREEN/CYAN
+        shuffle_x = start_x
+        draw.line([(shuffle_x, icon_y+12), (shuffle_x+8, icon_y+4)], fill=(80, 255, 150), width=2)
+        draw.line([(shuffle_x+8, icon_y+4), (shuffle_x+18, icon_y+4)], fill=(80, 255, 150), width=2)
+        draw.line([(shuffle_x, icon_y+16), (shuffle_x+8, icon_y+24)], fill=(80, 255, 150), width=2)
+        draw.line([(shuffle_x+8, icon_y+24), (shuffle_x+18, icon_y+24)], fill=(80, 255, 150), width=2)
+        draw.line([(shuffle_x+6, icon_y+20), (shuffle_x+14, icon_y+12)], fill=(80, 255, 150), width=2)
         
-        # Play
-        play_x = ICONS_X + icon_gap
-        draw.polygon([(play_x, icon_y+2), (play_x, icon_y+26), (play_x+28, icon_y+14)], fill=icon_color)
+        # 2. Repeat icon - ORANGE/YELLOW
+        repeat_x = start_x + icon_spacing
+        draw.arc([(repeat_x, icon_y+2), (repeat_x+24, icon_y+26)], 0, 270, fill=(255, 200, 80), width=2)
+        draw.polygon([(repeat_x+16, icon_y), (repeat_x+24, icon_y), (repeat_x+24, icon_y+8)], fill=(255, 200, 80))
+        draw.line([(repeat_x+18, icon_y+18), (repeat_x+26, icon_y+18)], fill=(255, 200, 80), width=2)
+        draw.polygon([(repeat_x+26, icon_y+14), (repeat_x+26, icon_y+22), (repeat_x+18, icon_y+18)], fill=(255, 200, 80))
         
-        # Next
-        next_x = ICONS_X + icon_gap * 2
-        draw.rectangle([(next_x, icon_y+4), (next_x+4, icon_y+24)], fill=icon_color)
-        draw.polygon([(next_x+6, icon_y+6), (next_x+6, icon_y+22), (next_x+24, icon_y+14)], fill=icon_color)
+        # 3. Previous icon - WHITE
+        prev_x = start_x + icon_spacing * 2
+        draw.polygon([(prev_x, icon_y+4), (prev_x, icon_y+24), (prev_x+20, icon_y+14)], fill="white")
+        draw.rectangle([(prev_x+22, icon_y+2), (prev_x+26, icon_y+26)], fill="white")
         
-        # Repeat
-        repeat_x = ICONS_X + icon_gap * 3
-        draw.arc([(repeat_x, icon_y+4), (repeat_x+26, icon_y+24)], 0, 270, fill=(120,120,120), width=2)
-        draw.polygon([(repeat_x+18, icon_y), (repeat_x+26, icon_y), (repeat_x+26, icon_y+8)], fill=(120,120,120))
+        # 4. Pause icon - WHITE (2 vertical bars)
+        pause_x = start_x + icon_spacing * 3
+        draw.rectangle([(pause_x, icon_y+2), (pause_x+8, icon_y+26)], fill="white")
+        draw.rectangle([(pause_x+16, icon_y+2), (pause_x+24, icon_y+26)], fill="white")
         
-        # Heart
-        heart_x = ICONS_X + icon_gap * 4 + 10
-        # Left circle
-        draw.ellipse([(heart_x, icon_y+6), (heart_x+12, icon_y+18)], fill=(255, 70, 70))
-        # Right circle
-        draw.ellipse([(heart_x+8, icon_y+6), (heart_x+20, icon_y+18)], fill=(255, 70, 70))
-        # Bottom triangle
-        draw.polygon([(heart_x+2, icon_y+12), (heart_x+18, icon_y+12), (heart_x+10, icon_y+24)], fill=(255, 70, 70))
+        # 5. Next icon - WHITE
+        next_x = start_x + icon_spacing * 4
+        draw.rectangle([(next_x, icon_y+2), (next_x+4, icon_y+26)], fill="white")
+        draw.polygon([(next_x+6, icon_y+4), (next_x+6, icon_y+24), (next_x+26, icon_y+14)], fill="white")
         
-        # Headphones
-        hp_x = ICONS_X + icon_gap * 5 + 10
-        draw.arc([(hp_x, icon_y), (hp_x+26, icon_y+18)], 180, 0, fill=(120,120,120), width=3)
-        draw.ellipse([(hp_x, icon_y+16), (hp_x+10, icon_y+26)], fill=(120,120,120))
-        draw.ellipse([(hp_x+16, icon_y+16), (hp_x+26, icon_y+26)], fill=(120,120,120))
+        # 6. Heart icon - RED
+        heart_x = start_x + icon_spacing * 5 + 5
+        draw.ellipse([(heart_x, icon_y+8), (heart_x+10, icon_y+18)], fill=(255, 70, 70))
+        draw.ellipse([(heart_x+8, icon_y+8), (heart_x+18, icon_y+18)], fill=(255, 70, 70))
+        draw.polygon([(heart_x+2, icon_y+13), (heart_x+16, icon_y+13), (heart_x+9, icon_y+24)], fill=(255, 70, 70))
+        
+        # 7. Headphones icon - WHITE
+        hp_x = start_x + icon_spacing * 6 + 10
+        draw.arc([(hp_x, icon_y+4), (hp_x+22, icon_y+20)], 180, 0, fill="white", width=3)
+        draw.ellipse([(hp_x, icon_y+18), (hp_x+9, icon_y+27)], fill="white")
+        draw.ellipse([(hp_x+13, icon_y+18), (hp_x+22, icon_y+27)], fill="white")
         
         # Save
         bg = bg.convert("RGB")
