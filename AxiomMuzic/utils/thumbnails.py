@@ -27,10 +27,10 @@ THUMB_Y = CARD_Y + 65  # Centered vertically
 THUMB_RADIUS = 35
 
 TITLE_X = THUMB_X + THUMB_SIZE + 60
-TITLE_Y = CARD_Y + 90
-META_Y = TITLE_Y + 50
+TITLE_Y = CARD_Y + 75
+META_Y = TITLE_Y + 65
 
-BAR_Y = META_Y + 55
+BAR_Y = META_Y + 65
 BAR_X = TITLE_X
 BAR_WIDTH = 510
 BAR_HEIGHT = 5
@@ -38,7 +38,7 @@ BAR_HEIGHT = 5
 PILL_W = 360
 PILL_H = 85
 PILL_RADIUS = 40
-PILL_X = TITLE_X + 150  # Controls ko right shift
+PILL_X = TITLE_X + 120  # Controls ko right shift
 PILL_Y = BAR_Y + 45
 
 MAX_TITLE_WIDTH = 520
@@ -230,9 +230,9 @@ async def get_thumb(videoid: str) -> str:
 
         # === CARD: LIGHT/WHITE TRANSPARENT BLUR (Sanam Re style) ===
         card_area = bg.crop((CARD_X, CARD_Y, CARD_X + CARD_W, CARD_Y + CARD_H))
-        card_area = card_area.filter(ImageFilter.GaussianBlur(10))  # Zyada blur
+        card_area = card_area.filter(ImageFilter.GaussianBlur(14))  # Zyada blur
         # LIGHT frosted glass - WHITE transparent
-        frosted = Image.new("RGBA", (CARD_W, CARD_H), (240, 240, 245, 120))
+        frosted = Image.new("RGBA", (CARD_W, CARD_H), (15, 15, 20, 100))
         card = Image.alpha_composite(card_area, frosted)
 
         mask = Image.new("L", (CARD_W, CARD_H), 0)
@@ -324,9 +324,9 @@ async def get_thumb(videoid: str) -> str:
 
         # Icons - bigger
         icon_y = PILL_Y + (PILL_H - 30) // 2
-        icon_size = 30
-        sx = PILL_X + 30
-        gap = 62
+        icon_size = 28
+        sx = PILL_X + 32
+        gap = 60
 
         icon_shuffle(draw, sx, icon_y, icon_size, "white")
         icon_prev(draw, sx + gap, icon_y, icon_size, "white")
