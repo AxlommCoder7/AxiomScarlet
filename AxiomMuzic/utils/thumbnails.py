@@ -1,7 +1,7 @@
 # -----------------------------------------------
-# 🔸 AxiomMusic Project - Transparent Card + Dual Palette
-# 🔹 Card: Pure transparent + high blur
-# 🔹 Two different random palettes for card & thumb borders
+# 🔸 AxiomMusic Project - Transparent Card + Dual Random Palettes
+# 🔹 Card: Pure transparent + high blur (NO color fill)
+# 🔹 Card & Thumb borders: DIFFERENT random color palettes
 # 📅 Copyright © 2026 – All Rights Reserved
 # -----------------------------------------------
 
@@ -24,10 +24,9 @@ CARD_X = (1280 - CARD_W) // 2
 CARD_Y = (720 - CARD_H) // 2
 CARD_RADIUS = 55
 
-# Thumbnail - BADA, RIGHT, THODA NICHE
 THUMB_SIZE = 350
-THUMB_X = CARD_X + 75  # Right shift
-THUMB_Y = CARD_Y + 70  # Thoda niche
+THUMB_X = CARD_X + 75
+THUMB_Y = CARD_Y + 70
 THUMB_RADIUS = 35
 
 TITLE_X = THUMB_X + THUMB_SIZE + 55
@@ -39,7 +38,6 @@ BAR_HEIGHT = 5
 BAR_X = TITLE_X
 BAR_Y = META_Y + 70
 
-# Controls - RIGHT aur NICHE
 CONTROLS_Y = BAR_Y + 70
 CONTROLS_X = TITLE_X + 30
 
@@ -116,7 +114,7 @@ def create_card_glow(size, radius, c_base, c_light, c_dark):
 
 
 def create_thumb_glow(size, radius, c_base, c_light, c_dark):
-    """Thumbnail border pe ALAG glow"""
+    """Thumbnail border pe ALAG glow (different palette)"""
     try:
         w, h = size
         layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -263,11 +261,13 @@ async def get_thumb(videoid: str) -> str:
     try:
         # === TWO DIFFERENT RANDOM PALETTES ===
         card_palette = _random_palette()      # Card border ke liye
-        thumb_palette = _random_palette()     # Thumb border ke liye
+        thumb_palette = _random_palette()     # Thumb border ke liye (ALAG!)
         
         c_base, c_light, c_dark = card_palette
         t_base, t_light, t_dark = thumb_palette
         
+        print(f"🎨 Card palette: {c_base}, Thumb palette: {t_base}")
+
         # === BACKGROUND ===
         base = Image.open(thumb_path).convert("RGBA")
         base = base.resize((1280, 720), Image.LANCZOS)
@@ -370,6 +370,7 @@ async def get_thumb(videoid: str) -> str:
         # === SAVE ===
         bg = bg.convert("RGB")
         bg.save(cache_path, "PNG", quality=99)
+        print(f"✓ Thumbnail saved: {cache_path}")
 
     except Exception as e:
         import traceback
