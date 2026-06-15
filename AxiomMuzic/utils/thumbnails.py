@@ -1,6 +1,6 @@
 # -----------------------------------------------
-# 🔸 AxiomMusic Project - FINAL with Random Palette
-# 🔹 Background + Card from your FINAL code
+# 🔸 AxiomMusic Project - FINAL with Glow
+# 🔹 Card border pe proper glow + shadow
 # 📅 Copyright © 2026 – All Rights Reserved
 # -----------------------------------------------
 
@@ -25,20 +25,20 @@ CARD_RADIUS = 55
 
 THUMB_SIZE = 320
 THUMB_X = CARD_X + 65
-THUMB_Y = CARD_Y + 65
+THUMB_Y = CARD_Y + 85  # Niche kiya (pehle 65 tha)
 THUMB_RADIUS = 35
 
 TITLE_X = THUMB_X + THUMB_SIZE + 60
-TITLE_Y = CARD_Y + 90
-META_Y = TITLE_Y + 50
+TITLE_Y = CARD_Y + 95
+META_Y = TITLE_Y + 55
 
 BAR_WIDTH = 480
 BAR_HEIGHT = 5
 BAR_X = TITLE_X
-BAR_Y = META_Y + 65
+BAR_Y = META_Y + 70
 
-CONTROLS_Y = BAR_Y + 50
-CONTROLS_X = TITLE_X
+CONTROLS_Y = BAR_Y + 60
+CONTROLS_X = TITLE_X + 20  # Thoda right
 
 MAX_TITLE_WIDTH = 520
 
@@ -83,46 +83,86 @@ def _random_palette():
     return base, light, dark
 
 
-def create_thin_rainbow_border(size, radius, c_base, c_light, c_dark, thickness=6):
-    """Thin rainbow border with random colors"""
+def create_card_glow_border(size, radius, c_base, c_light, c_dark):
+    """Card border with PROPER GLOW + SHADOW"""
     try:
         w, h = size
-        canvas = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(canvas)
-
-        colors = [c_base, c_light, c_dark, (255, 255, 255), c_base]
-
-        num_layers = 20
-        for i in range(num_layers):
-            t = i / num_layers
-            idx = int(t * (len(colors) - 1))
-            idx = min(idx, len(colors) - 2)
-            frac = t * (len(colors) - 1) - idx
-            c1, c2 = colors[idx], colors[idx + 1]
-            r = int(c1[0] + (c2[0] - c1[0]) * frac)
-            g = int(c1[1] + (c2[1] - c1[1]) * frac)
-            b = int(c1[2] + (c2[2] - c1[2]) * frac)
-
-            offset = i * (thickness / num_layers)
-            layer_r = radius - offset
-            
-            if layer_r < 1:
-                break
-
+        layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(layer)
+        
+        # OUTER GLOW LAYERS (white glow)
+        for i in range(35, 0, -3):
+            alpha = int(80 * (1 - i / 35) ** 1.5)
             draw.rounded_rectangle(
-                (int(offset), int(offset),
-                 int(w - offset), int(h - offset)),
-                radius=int(layer_r),
-                outline=(r, g, b, 255),
-                width=1
+                [0 - i, 0 - i, w + i, h + i],
+                radius=radius + i,
+                fill=(255, 255, 255, alpha)
             )
-
-        glow = canvas.filter(ImageFilter.GaussianBlur(2))
-        return glow
+        
+        # COLOR GLOW LAYERS
+        for i in range(20, 0, -2):
+            alpha = int(100 * (1 - i / 20) ** 1.4)
+            draw.rounded_rectangle(
+                [0 - i, 0 - i, w + i, h + i],
+                radius=radius + i,
+                fill=(*c_base, alpha)
+            )
+        
+        # INNER BACKGROUND
+        draw.rounded_rectangle(
+            [8, 8, w - 8, h - 8],
+            radius=max(radius - 8, 4),
+            fill=(15, 20, 25, 255)
+        )
+        
+        # BORDER LINES
+        for offset, color, bw in [
+            (0, (*c_dark, 255), 4),
+            (2, (*c_base, 255), 3),
+            (4, (*c_light, 200), 2)
+        ]:
+            draw.rounded_rectangle(
+                [offset, offset, w - offset, h - offset],
+                radius=max(radius - offset, 4),
+                outline=color,
+                width=bw
+            )
+        
+        # Apply blur for glow effect
+        return layer.filter(ImageFilter.GaussianBlur(3))
 
     except Exception as e:
         print(f"Border error: {e}")
         return Image.new("RGBA", size, (0, 0, 0, 0))
+
+
+def create_thumb_glow_shadow(size, x, y, w, h, radius, c_base):
+    """Thumbnail shadow + glow"""
+    shadow_layer = Image.new("RGBA", size, (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow_layer)
+    
+    off_x, off_y = 8, 12
+    
+    # Deep black shadow
+    for i in range(40, 0, -1):
+        alpha = int(200 * (1 - i / 40) ** 1.3)
+        sd.rounded_rectangle(
+            [x + off_x - i, y + off_y - i, x + w + off_x + i, y + h + off_y + i],
+            radius=radius + i,
+            fill=(0, 0, 0, alpha)
+        )
+    
+    # Color glow
+    for i in range(18, 0, -1):
+        alpha = int(100 * (1 - i / 18) ** 1.5)
+        sd.rounded_rectangle(
+            [x - i, y - i, x + w + i, y + h + i],
+            radius=radius + i,
+            fill=(*c_base, alpha)
+        )
+    
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(18))
+    return shadow_layer
 
 
 # ===== ICONS =====
@@ -183,7 +223,6 @@ async def get_thumb(videoid: str) -> str:
     cache_path = os.path.join(CACHE_DIR, f"{videoid}_final.png")
     thumb_path = os.path.join(CACHE_DIR, f"thumb_{videoid}.png")
 
-    # Fetch metadata
     try:
         results = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
         results_data = await results.next()
@@ -203,7 +242,6 @@ async def get_thumb(videoid: str) -> str:
     is_live = not duration or str(duration).strip().lower() in {"", "live", "live now"}
     duration_text = "LIVE" if is_live else (duration or "Unknown")
 
-    # Download thumbnail
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail_url, timeout=10) as resp:
@@ -220,7 +258,7 @@ async def get_thumb(videoid: str) -> str:
         # === RANDOM PALETTE ===
         c_base, c_light, c_dark = _random_palette()
         
-        # === BACKGROUND (EXACT from your FINAL code) ===
+        # === BACKGROUND ===
         base = Image.open(thumb_path).convert("RGBA")
         base = base.resize((1280, 720), Image.LANCZOS)
         base = ImageEnhance.Brightness(base).enhance(1.35)
@@ -230,7 +268,7 @@ async def get_thumb(videoid: str) -> str:
         dark = Image.new("RGBA", bg.size, (0, 0, 0, 70))
         bg = Image.alpha_composite(bg, dark)
 
-        # === CARD with TRANSPARENT BLUR (EXACT from your FINAL code) ===
+        # === CARD with TRANSPARENT BLUR ===
         card_area = bg.crop((CARD_X, CARD_Y, CARD_X + CARD_W, CARD_Y + CARD_H))
         card_area = card_area.filter(ImageFilter.GaussianBlur(25))
         card = card_area.convert("RGBA")
@@ -239,37 +277,27 @@ async def get_thumb(videoid: str) -> str:
         ImageDraw.Draw(mask).rounded_rectangle((0, 0, CARD_W, CARD_H), radius=CARD_RADIUS, fill=255)
         bg.paste(card, (CARD_X, CARD_Y), mask)
 
-        # === THIN RAINBOW BORDER with RANDOM COLORS ===
-        card_border = create_thin_rainbow_border(
-            (CARD_W, CARD_H), CARD_RADIUS, c_base, c_light, c_dark, thickness=6
+        # === CARD GLOW BORDER ===
+        card_glow = create_card_glow_border(
+            (CARD_W, CARD_H), CARD_RADIUS, c_base, c_light, c_dark
         )
-        bg.paste(card_border, (CARD_X, CARD_Y), card_border)
+        bg.paste(card_glow, (CARD_X, CARD_Y), card_glow)
 
-        # === THUMBNAIL ===
+        # === THUMBNAIL with GLOW + SHADOW ===
         thumb_img = Image.open(thumb_path).convert("RGBA")
         thumb_img = thumb_img.resize((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
         thumb_img = ImageEnhance.Brightness(thumb_img).enhance(1.1)
+
+        # Shadow + glow
+        thumb_shadow = create_thumb_glow_shadow(
+            (1280, 720), THUMB_X, THUMB_Y, THUMB_SIZE, THUMB_SIZE, THUMB_RADIUS, c_base
+        )
+        bg = Image.alpha_composite(bg.convert("RGBA"), thumb_shadow)
 
         thumb_mask = Image.new("L", (THUMB_SIZE, THUMB_SIZE), 0)
         ImageDraw.Draw(thumb_mask).rounded_rectangle(
             (0, 0, THUMB_SIZE, THUMB_SIZE), radius=THUMB_RADIUS, fill=255
         )
-
-        shadow = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
-        sd = ImageDraw.Draw(shadow)
-        sd.rounded_rectangle(
-            (THUMB_X - 8, THUMB_Y - 8,
-             THUMB_X + THUMB_SIZE + 8, THUMB_Y + THUMB_SIZE + 8),
-            radius=THUMB_RADIUS + 10, fill=(0, 0, 0, 140)
-        )
-        shadow = shadow.filter(ImageFilter.GaussianBlur(16))
-        bg = Image.alpha_composite(bg, shadow)
-
-        # Thumbnail border with random colors
-        t_border = create_thin_rainbow_border(
-            (THUMB_SIZE, THUMB_SIZE), THUMB_RADIUS, c_base, c_light, c_dark, thickness=4
-        )
-        bg.paste(t_border, (THUMB_X, THUMB_Y), t_border)
 
         bg.paste(thumb_img, (THUMB_X, THUMB_Y), thumb_mask)
 
@@ -299,7 +327,7 @@ async def get_thumb(videoid: str) -> str:
         )
         draw.rounded_rectangle(
             [(BAR_X, BAR_Y), (BAR_X + progress, BAR_Y + BAR_HEIGHT)],
-            radius=3, fill=c_base  # Random color
+            radius=3, fill=c_base
         )
 
         cx, cy = BAR_X + progress, BAR_Y + BAR_HEIGHT // 2
