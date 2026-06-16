@@ -29,7 +29,7 @@ import asyncio
 from pyrogram.types import InputMediaPhoto
 
 
-async def animate_thumbnail_progress(message, videoid, duration_seconds, chat_id, title, duration_min, user_name):
+async def animate_thumbnail_progress(_, message, videoid, duration_seconds, chat_id, title, duration_min, user_name):
     """
     Har 10 second mein thumbnail update karega with new color and progress
     """
@@ -60,11 +60,12 @@ async def animate_thumbnail_progress(message, videoid, duration_seconds, chat_id
                         media=InputMediaPhoto(
                             media=thumb_path,
                             caption=_["stream_1"].format(
-                                f"https://t.me/{app.username}?start=info_{vidid}",
+                                f"https://t.me/{app.username}?start=info_{videoid}",
                                 title[:23],
                                 duration_min,
                                 user_name,
                             ),
+                        ),
                     )
                 except Exception as e:
                     # Agar edit fail ho (message delete ho gaya), toh stop kar
@@ -188,7 +189,7 @@ async def stream(
                     else:
                         duration_sec = 180
                     asyncio.create_task(
-                        animate_thumbnail_progress(run, vidid, duration_sec, chat_id, title, duration_min, user_name)
+                        animate_thumbnail_progress(_, run, vidid, duration_sec, chat_id, title, duration_min, user_name)
                     )
                 except Exception as e:
                     print(f"Failed to start animation: {e}")
@@ -289,7 +290,7 @@ async def stream(
                 else:
                     duration_sec = 180
                 asyncio.create_task(
-                    animate_thumbnail_progress(run, vidid, duration_sec, chat_id, title, duration_min, user_name)
+                    animate_thumbnail_progress(_, run, vidid, duration_sec, chat_id, title, duration_min, user_name)
                 )
             except Exception as e:
                 print(f"Failed to start animation: {e}")
