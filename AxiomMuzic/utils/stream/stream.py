@@ -59,8 +59,12 @@ async def animate_thumbnail_progress(message, videoid, duration_seconds, chat_id
                     await message.edit_media(
                         media=InputMediaPhoto(
                             media=thumb_path,
-                            caption=f"https://t.me/{app.username}?start=info_{videoid}\n\n🎵 **{title[:23]}**\n⏱️ {duration_min} | 👤 {user_name}",
-                        ),
+                            caption=_["stream_1"].format(
+                                f"https://t.me/{app.username}?start=info_{vidid}",
+                                title[:23],
+                                duration_min,
+                                user_name,
+                            ),
                     )
                 except Exception as e:
                     # Agar edit fail ho (message delete ho gaya), toh stop kar
