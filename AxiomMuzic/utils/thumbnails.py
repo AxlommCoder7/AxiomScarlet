@@ -154,7 +154,7 @@ THUMB_X = 60
 THUMB_Y = (720 - THUMB_SIZE) // 2
 THUMB_RADIUS = 50
 
-TITLE_X = THUMB_X + THUMB_SIZE + 60
+TITLE_X = THUMB_X + THUMB_SIZE + 35
 TITLE_Y = 180
 META_Y = TITLE_Y + 75
 VIEWS_Y = META_Y + 55
@@ -264,20 +264,22 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         bg = Image.alpha_composite(bg, shadow)
 
         # Thumbnail border with 8 LAYERS SOFT GRADIENT
+        # Thumbnail border with 16 LAYERS ULTRA SMOOTH GRADIENT
         thumb_glow = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
         tg = ImageDraw.Draw(thumb_glow)
         
-        # 8 layers - bahar se andar fade
-        for spread, alpha in [(28, 25), (24, 45), (20, 70), (16, 100), (12, 135), (8, 175), (5, 215), (2, 245)]:
+        # 16 layers - bahut smooth fade
+        for spread, alpha in [(32, 15), (30, 22), (28, 30), (26, 40), (24, 52), (22, 65), (20, 80), (18, 95), 
+                              (16, 112), (14, 130), (12, 150), (10, 172), (8, 195), (6, 218), (4, 235), (2, 250)]:
             tg.rounded_rectangle(
                 (THUMB_X - spread, THUMB_Y - spread,
                  THUMB_X + THUMB_SIZE + spread, THUMB_Y + THUMB_SIZE + spread),
                 radius=THUMB_RADIUS + spread,
                 outline=accent + (alpha,),
-                width=4
+                width=3
             )
         
-        # Inner glow (inside border)
+        # Inner glow
         for inner, alpha in [(3, 120), (6, 80)]:
             tg.rounded_rectangle(
                 (THUMB_X + inner, THUMB_Y + inner,
@@ -305,8 +307,20 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
             time_font = title_font
 
         # Title - WHITE with shadow
+        # Title - GLOW + SHADOW + WHITE (attractive)
         trimmed = trim_text(title, title_font, MAX_TITLE_WIDTH)
-        draw.text((TITLE_X + 2, TITLE_Y + 2), trimmed, fill=(0, 0, 0, 150), font=title_font)
+        
+        # Glow effect (4 layers)
+        for offset, alpha in [(4, 60), (3, 90), (2, 130), (1, 180)]:
+            draw.text((TITLE_X + offset, TITLE_Y + offset), trimmed, 
+                      fill=accent + (alpha,), font=title_font)
+            draw.text((TITLE_X - offset, TITLE_Y - offset), trimmed, 
+                      fill=accent + (alpha,), font=title_font)
+        
+        # Shadow
+        draw.text((TITLE_X + 2, TITLE_Y + 2), trimmed, fill=(0, 0, 0, 180), font=title_font)
+        
+        # Main white text
         draw.text((TITLE_X, TITLE_Y), trimmed, fill="white", font=title_font)
 
         # Channel - LIGHT GRAY
@@ -361,17 +375,18 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         # Progress circle with SOFTER GRADIENT SHADOW (fade effect)
         # Progress circle with VERY SOFT FADE
         # Progress circle with 8 LAYERS SOFT FADE
+        # Progress circle - ULTRA SOFT 12 LAYERS FADE
         cx, cy = BAR_X + progress, BAR_Y + BAR_HEIGHT // 2
         
-        # 8 layers - center se bahar fade
-        for glow_size, alpha in [(22, 20), (18, 40), (14, 65), (10, 95), (7, 130), (4, 170), (2, 210), (1, 245)]:
+        # 12 layers - bahut smooth fade
+        for glow_size, alpha in [(25, 15), (20, 25), (16, 40), (12, 60), (9, 85), 
+                                 (6, 115), (4, 150), (3, 190), (2, 225), (1, 250)]:
             draw.ellipse([(cx - glow_size, cy - glow_size), 
                          (cx + glow_size, cy + glow_size)],
                         fill=accent + (alpha,))
         
-        # Center circle - chhota aur soft
-        draw.ellipse([(cx - 5, cy - 5), (cx + 5, cy + 5)], fill="white")
-        draw.ellipse([(cx - 3, cy - 3), (cx + 3, cy + 3)], fill=(240, 240, 240))
+        # Center - chhota aur soft
+        draw.ellipse([(cx - 4, cy - 4), (cx + 4, cy + 4)], fill="white")
 
         # Calculate current time
         try:
