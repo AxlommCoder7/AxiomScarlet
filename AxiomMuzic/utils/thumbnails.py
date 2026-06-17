@@ -160,14 +160,14 @@ META_Y = TITLE_Y + 75
 VIEWS_Y = META_Y + 55
 PLAYER_Y = VIEWS_Y + 55
 DEV_Y = PLAYER_Y + 55
-REQUESTED_Y = DEV_Y + 55  # NEW LINE ADD KAR
+REQUESTED_Y = DEV_Y + 55
 
 BAR_X = TITLE_X
-BAR_Y = DEV_Y + 125  # MOVED DOWN (pehle 55 tha)
+BAR_Y = DEV_Y + 125
 BAR_WIDTH = 680
 BAR_HEIGHT = 8
 
-TIME_Y = BAR_Y + 40  # Time bar ke niche
+TIME_Y = BAR_Y + 40
 
 MAX_TITLE_WIDTH = 700
 
@@ -188,11 +188,10 @@ def trim_text(text, font, max_width):
 
 
 async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = True, user_name: str = "AxiomUser") -> str:
-    # Cache path includes progress and timestamp for uniqueness
+    print(f"📥 get_thumb called with videoid: {videoid}, progress: {progress_percent}%")
     timestamp = int(time.time()) if not use_cache else 0
     cache_path = os.path.join(CACHE_DIR, f"{videoid}_p{progress_percent}_t{timestamp}.png")
     
-    # Only use cache if enabled and file exists
     if use_cache and os.path.exists(cache_path):
         return cache_path
 
@@ -226,7 +225,7 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         return YOUTUBE_IMG_URL
 
     try:
-        # BACKGROUND - INCREASED BLUR
+        # BACKGROUND
         base = Image.open(thumb_path).convert("RGBA")
         base = base.resize((1280, 720), Image.LANCZOS)
         base = ImageEnhance.Brightness(base).enhance(1.1)
@@ -265,7 +264,6 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         thumb_glow = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
         tg = ImageDraw.Draw(thumb_glow)
         
-        # Soft gradient shadow - center se bahar fade
         for spread, alpha in [(25, 40), (20, 70), (15, 110), (10, 160), (6, 200), (3, 240)]:
             tg.rounded_rectangle(
                 (THUMB_X - spread, THUMB_Y - spread,
@@ -275,7 +273,6 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
                 width=5
             )
         
-        # Inner glow (inside border)
         for inner, alpha in [(3, 120), (6, 80)]:
             tg.rounded_rectangle(
                 (THUMB_X + inner, THUMB_Y + inner,
@@ -323,14 +320,9 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         draw.text((TITLE_X, DEV_Y), "Dev: Maanav",
                   fill=(190, 190, 190), font=axiom_font)
 
-        # Requested By - LIGHT GRAY (unidecode ke saath)
-        # Requested By - unidecode ke saath
-        # Requested By - with fallback chain
-        # Requested By - "Requested By:" gray, naam accent color mein
-        # Requested By section mein:
+        # Requested By - "Requested By |" gray, naam accent color mein
         try:
             from unidecode import unidecode
-            # HTML tags remove kar
             clean_name = re.sub(r'<[^>]+>', '', str(user_name))
             clean_name = unidecode(clean_name).strip()
         except:
@@ -339,15 +331,14 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         if not clean_name:
             clean_name = "AxiomUser"
         
-        # "Requested By: " gray mein
         prefix_text = "Requested By | "
         draw.text((TITLE_X, REQUESTED_Y), prefix_text, 
                   fill=(190, 190, 190), font=axiom_font)
         
-        # Naam accent color mein
         prefix_width = axiom_font.getlength(prefix_text)
         draw.text((TITLE_X + prefix_width, REQUESTED_Y), clean_name, 
                   fill=accent, font=axiom_font)
+
         # Progress bar background
         bar_end = BAR_X + BAR_WIDTH
         draw.rounded_rectangle(
@@ -355,27 +346,27 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
             radius=10, fill=(60, 60, 60)
         )
 
-        # Progress fill (DYNAMIC)
+        # Progress fill
         progress = int(BAR_WIDTH * (progress_percent / 100))
         draw.rounded_rectangle(
             [(BAR_X, BAR_Y), (BAR_X + progress, BAR_Y + BAR_HEIGHT)],
             radius=10, fill=accent
         )
 
-        # Progress circle with SOFT GRADIENT SHADOW
+        # Progress circle with SOFTER GRADIENT SHADOW (fade effect)
         cx, cy = BAR_X + progress, BAR_Y + BAR_HEIGHT // 2
         
-        # Soft gradient shadow - center se bahar fade effect
-        for glow_size, alpha in [(30, 30), (24, 50), (18, 80), (12, 130), (8, 190), (4, 240)]:
+        # Soft gradient - bahut zyada layers for smooth fade
+        for glow_size, alpha in [(35, 20), (28, 40), (22, 70), (16, 110), (10, 160), (6, 210), (3, 250)]:
             draw.ellipse([(cx - glow_size, cy - glow_size), 
                          (cx + glow_size, cy + glow_size)],
                         fill=accent + (alpha,))
         
-        # White circle - center
-        draw.ellipse([(cx - 11, cy - 11), (cx + 11, cy + 11)], fill=(210, 210, 210)) 
-        draw.ellipse([(cx - 6, cy - 6), (cx + 6, cy + 6)], fill=(230, 230, 230))
+        # Center circle - white with slight transparency
+        draw.ellipse([(cx - 11, cy - 11), (cx + 11, cy + 11)], fill="white")
+        draw.ellipse([(cx - 6, cy - 6), (cx + 6, cy + 6)], fill=(245, 245, 245))
 
-        # Calculate current time based on progress
+        # Calculate current time
         try:
             if duration and ":" in str(duration):
                 parts = str(duration).split(":")
@@ -395,11 +386,10 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         except:
             current_time = "0:00"
 
-        # Times - LIGHT GRAY
         # Times - LIGHT GRAY (bar ke niche)
         draw.text((BAR_X, TIME_Y), current_time, fill=(200, 200, 200), font=time_font)  
         total = duration_text if not is_live else "LIVE"
-        draw.text((bar_end - 50, TIME_Y), total, fill=(200, 200, 200), font=time_font) 
+        draw.text((bar_end - 50, TIME_Y), total, fill=(200, 200, 200), font=time_font)  
 
         # SAVE
         bg = bg.convert("RGB")
