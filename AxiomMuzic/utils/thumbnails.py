@@ -163,11 +163,11 @@ DEV_Y = PLAYER_Y + 55
 REQUESTED_Y = DEV_Y + 55  # NEW LINE ADD KAR
 
 BAR_X = TITLE_X
-BAR_Y = DEV_Y + 95  # MOVED DOWN (pehle 55 tha)
+BAR_Y = DEV_Y + 125  # MOVED DOWN (pehle 55 tha)
 BAR_WIDTH = 680
 BAR_HEIGHT = 8
 
-TIME_Y = BAR_Y + 35  # Time bar ke niche
+TIME_Y = BAR_Y + 40  # Time bar ke niche
 
 MAX_TITLE_WIDTH = 700
 
