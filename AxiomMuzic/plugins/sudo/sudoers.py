@@ -12,6 +12,7 @@
 # ❤️ Made with dedication and love by AxiomBots
 # -----------------------------------------------
 import random
+import config
 from pyrogram.enums import ButtonStyle
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
