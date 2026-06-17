@@ -239,20 +239,22 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
 
         # OUTER BORDER
         # OUTER BORDER (Thin + 15 Layer Inner Fade Glow)
+        # OUTER BORDER (Thin + 15 Layer Inner Smooth Glow)
         border_layer = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
         bd = ImageDraw.Draw(border_layer)
         
-        # 1. Thin solid outer border (18 se 6 kar diya)
+        # 1. Thin solid outer border
         bd.rectangle((0, 0, 1279, 719), outline=accent, width=6)
         
-        # 2. 15 Layer Inner Glow (Border se andar ki taraf fade)
-        inner_glow_layers = [
-            (8, 245), (12, 225), (17, 205), (22, 185), (28, 165),
-            (34, 145), (41, 125), (48, 105), (56, 85), (64, 70),
-            (73, 55), (82, 40), (92, 25), (102, 15), (113, 5)
+        # 2. 15 Layer Inner Glow - Border se andar smooth fade (thumbnail jaise)
+        # (inset, alpha) - inset border ke andar ki doori, alpha transparency
+        inner_glow_params = [
+            (7, 245), (11, 225), (16, 205), (21, 185), (27, 165),
+            (33, 145), (40, 125), (47, 105), (55, 85), (63, 70),
+            (72, 55), (81, 40), (91, 28), (102, 18), (113, 10)
         ]
         
-        for inset, alpha in inner_glow_layers:
+        for inset, alpha in inner_glow_params:
             bd.rectangle(
                 (inset, inset, 1279 - inset, 719 - inset),
                 outline=accent + (alpha,),
@@ -260,27 +262,6 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
             )
             
         bg = Image.alpha_composite(bg, border_layer)
-
-        # THUMBNAIL
-        thumb_img = Image.open(thumb_path).convert("RGBA")
-        thumb_img = thumb_img.resize((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
-        thumb_img = ImageEnhance.Brightness(thumb_img).enhance(1.1)
-
-        thumb_mask = Image.new("L", (THUMB_SIZE, THUMB_SIZE), 0)
-        ImageDraw.Draw(thumb_mask).rounded_rectangle(
-            (0, 0, THUMB_SIZE, THUMB_SIZE), radius=THUMB_RADIUS, fill=255
-        )
-
-        # Thumbnail shadow - ACCENT COLOR
-        shadow = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
-        sd = ImageDraw.Draw(shadow)
-        sd.rounded_rectangle(
-            (THUMB_X - 8, THUMB_Y - 8,
-             THUMB_X + THUMB_SIZE + 8, THUMB_Y + THUMB_SIZE + 8),
-            radius=THUMB_RADIUS + 10, fill=accent + (140,)
-        )
-        shadow = shadow.filter(ImageFilter.GaussianBlur(25))
-        bg = Image.alpha_composite(bg, shadow)
 
         # Thumbnail border with 16 LAYERS ULTRA SMOOTH GRADIENT
         thumb_glow = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
