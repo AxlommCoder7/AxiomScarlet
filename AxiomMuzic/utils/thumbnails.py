@@ -260,11 +260,36 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
             
         # bg = Image.alpha_composite(bg, border_layer)
                 # OUTER BORDER - Simple Solid Border
+        # border_layer = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
+        # bd = ImageDraw.Draw(border_layer)
+        
+        # # Simple solid border (width 6)
+        # bd.rectangle((0, 0, 1279, 719), outline=accent, width=6)
+            
+        # bg = Image.alpha_composite(bg, border_layer)
+
+                # OUTER BORDER - 16 Layer Inner Smooth Glow (Thumbnail Jaisa)
         border_layer = Image.new("RGBA", (1280, 720), (0, 0, 0, 0))
         bd = ImageDraw.Draw(border_layer)
         
-        # Simple solid border (width 6)
+        # 1. Thin solid outer border
         bd.rectangle((0, 0, 1279, 719), outline=accent, width=6)
+        
+        # 2. 16 Layer Inner Glow - Thumbnail jaisa smooth fade (andar ki taraf)
+        # (inset, alpha) - inset border ke andar ki doori
+        # Alpha 250 se 15 tak (bahar se andar fade)
+        inner_glow_params = [
+            (2, 250), (4, 235), (6, 218), (8, 195), (10, 172),
+            (12, 150), (14, 130), (16, 112), (18, 95), (20, 80),
+            (22, 65), (24, 52), (26, 40), (28, 30), (30, 22), (32, 15)
+        ]
+        
+        for inset, alpha in inner_glow_params:
+            bd.rectangle(
+                (inset, inset, 1279 - inset, 719 - inset),
+                outline=accent + (alpha,),
+                width=2
+            )
             
         bg = Image.alpha_composite(bg, border_layer)
 
