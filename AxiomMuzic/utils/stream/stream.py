@@ -166,7 +166,7 @@ async def stream(
                     "video" if video else "audio",
                     forceplay=forceplay,
                 )
-                img = await get_thumb(vidid, user_name=user_name)
+                img = await get_thumb(vidid, user_name=user_name if user_name else "AxiomUser")
                 button = stream_markup(_, chat_id)
                 run = await app.send_photo(
                     original_chat_id,
@@ -192,7 +192,7 @@ async def stream(
                     else:
                         duration_sec = 180
                     asyncio.create_task(
-                        animate_thumbnail_progress(_, run, vidid, duration_sec, chat_id, title, duration_min, user_name)
+                        animate_thumbnail_progress(_, run, vidid, duration_sec, chat_id, title, duration_min, user_name or "AxiomUser")
                     )
                 except Exception as e:
                     print(f"Failed to start animation: {e}")
@@ -267,7 +267,7 @@ async def stream(
                 "video" if video else "audio",
                 forceplay=forceplay,
             )
-            img = await get_thumb(vidid, user_name=user_name)
+            img = await get_thumb(vidid, user_name=user_name if user_name else "AxiomUser")
             button = stream_markup(_, chat_id)
             run = await app.send_photo(
                 original_chat_id,
@@ -293,7 +293,7 @@ async def stream(
                 else:
                     duration_sec = 180
                 asyncio.create_task(
-                    animate_thumbnail_progress(_, run, vidid, duration_sec, chat_id, title, duration_min, user_name)
+                    animate_thumbnail_progress(_, run, vidid, duration_sec, chat_id, title, duration_min, user_name or "AxiomUser")
                 )
             except Exception as e:
                 print(f"Failed to start animation: {e}")
@@ -450,7 +450,7 @@ async def stream(
                 "video" if video else "audio",
                 forceplay=forceplay,
             )
-            img = await get_thumb(vidid, user_name=user_name)
+            img = await get_thumb(vidid, user_name=user_name if user_name else "AxiomUser")
             button = stream_markup(_, chat_id)
             run = await app.send_photo(
                 original_chat_id,
