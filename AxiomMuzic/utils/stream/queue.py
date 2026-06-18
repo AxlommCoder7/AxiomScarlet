@@ -57,6 +57,44 @@ async def put_queue(
         db[chat_id].append(put)
     autoclean.append(file)
 
+        # AUTOPLAY TRIGGER
+    try:
+        if await is_autoplay(chat_id):
+            from AxiomMusic.utils.stream.autoplay import maybe_refetch_autoplay
+            asyncio.create_task(maybe_refetch_autoplay(
+                chat_id,
+                {
+                    "chat_id": original_chat_id,
+                    "user_id": user_id,
+                    "streamtype": stream,
+                    "vidid": vidid,
+                    "title": title,
+                    "by": user
+                }
+            ))
+    except Exception as e:
+        pass
+        
+    # --- AUTOPLAY TRIGGER (Added to fetch songs automatically) ---
+    try:
+        from AxiomMusic.utils.database import is_autoplay
+        from AxiomMusic.utils.stream.autoplay import maybe_refetch_autoplay
+        
+        if await is_autoplay(chat_id):
+            asyncio.create_task(maybe_refetch_autoplay(
+                chat_id, 
+                {
+                    "chat_id": chat_id, 
+                    "user_id": user_id, 
+                    "streamtype": stream, 
+                    "vidid": vidid, 
+                    "title": title, 
+                    "by": user
+                }
+            ))
+    except Exception:
+        pass
+        
 
 async def put_queue_index(
     chat_id,
@@ -100,3 +138,23 @@ async def put_queue_index(
             db[chat_id].append(put)
     else:
         db[chat_id].append(put)
+
+    # --- AUTOPLAY TRIGGER for Index streams too ---
+    try:
+        from AxiomMusic.utils.database import is_autoplay
+        from AxiomMusic.utils.stream.autoplay import maybe_refetch_autoplay
+        
+        if await is_autoplay(chat_id):
+            asyncio.create_task(maybe_refetch_autoplay(
+                chat_id, 
+                {
+                    "chat_id": chat_id, 
+                    "user_id": user_id, 
+                    "streamtype": stream, 
+                    "vidid": vidid, 
+                    "title": title, 
+                    "by": user
+                }
+            ))
+    except Exception:
+        pass
