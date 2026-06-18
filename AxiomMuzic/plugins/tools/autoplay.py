@@ -6,7 +6,7 @@
 
 import re
 from pyrogram import filters
-from pyrogram.enums import ChatMemberStatus
+from pyrogram.enums import ChatMemberStatus, ButtonStyle
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from AxiomMuzic import app
@@ -23,11 +23,6 @@ AUTOPLAY_RE = re.compile(
 )
 ON_STATES = {"on", "enable", "enabled"}
 OFF_STATES = {"off", "disable", "disabled"}
-
-
-def autoplay_filter(_, __, message: Message):
-    text = message.text or message.caption or ""
-    return bool(AUTOPLAY_RE.match(text.strip()))
 
 
 def parse_autoplay_state(message: Message):
@@ -60,17 +55,23 @@ async def can_toggle_autoplay(chat_id: int, user_id: int) -> bool:
 
 
 def autoplay_markup(status: bool):
-    toggle_text = "ᴛᴜʀɴ ᴏғғ ❌" if status else "ᴛᴜʀɴ ᴏɴ ✅"
-    toggle_state = "off" if status else "on"
+    # Green button when ON, Red button when OFF
+    if status:
+        button_text = "♬ ᴀᴜᴛᴏᴘʟᴀʏ | ᴏɴ"
+        toggle_state = "off"  # Click to turn off
+    else:
+        button_text = "♬ ᴀᴜᴛᴏᴘʟᴀʏ | ᴏғғ"
+        toggle_state = "on"  # Click to turn on
+
     return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
-                    toggle_text,
+                    button_text,
                     callback_data=f"autoplay_toggle|{toggle_state}",
+                    style=ButtonStyle.SUCCESS if status else ButtonStyle.DANGER,
                 )
-            ],
-            [InlineKeyboardButton("⋞ ᴄʟᴏsє ⋟", callback_data="close")],
+            ]
         ]
     )
 
@@ -85,7 +86,7 @@ def autoplay_text(status: bool):
     )
 
 
-@app.on_message(filters.command(["autoplay", "aplay", "ap"], prefixes=["/", "!", ".", ""]) & filters.group & ~BANNED_USERS)
+@app.on_message(filters.command(["autoplay", "aplay", "ap"], prefixes=["/", "!", "."]) & filters.group & ~BANNED_USERS)
 @AdminActual
 async def autoplay_command(_, message: Message, __):
     if not message.from_user:
@@ -124,11 +125,11 @@ async def autoplay_callback(_, callback_query: CallbackQuery, __):
     if state == "on":
         await autoplay_on(chat_id)
         status = True
-        alert = "Autoplay enabled ✅"
+        alert = "♬ ᴀᴜᴛᴏᴘʟᴀʏ | ᴇɴᴀʙʟᴇᴅ"
     else:
         await autoplay_off(chat_id)
         status = False
-        alert = "Autoplay disabled ❌"
+        alert = "♬ ᴀᴜᴛᴏᴘʟᴀʏ | ᴅɪsᴀʙʟᴇᴅ"
 
     await callback_query.answer(alert, show_alert=True)
 
