@@ -17,6 +17,7 @@ from AxiomMuzic.misc import db
 from AxiomMuzic.utils.formatters import check_duration, seconds_to_min
 from config import autoclean, time_to_seconds
 
+
 async def put_queue(
     chat_id,
     original_chat_id,
@@ -34,6 +35,7 @@ async def put_queue(
         duration_in_seconds = time_to_seconds(duration) - 3
     except:
         duration_in_seconds = 0
+
     put = {
         "title": title,
         "dur": duration,
@@ -57,10 +59,14 @@ async def put_queue(
         db[chat_id].append(put)
     autoclean.append(file)
 
-        # AUTOPLAY TRIGGER
+    # ==========================================
+    # AUTOPLAY TRIGGER (Single, Clean Block)
+    # ==========================================
     try:
+        from AxiomMuzic.utils.database import is_autoplay
+        from AxiomMuzic.utils.stream.autoplay import maybe_refetch_autoplay
+        
         if await is_autoplay(chat_id):
-            from AxiomMusic.utils.stream.autoplay import maybe_refetch_autoplay
             asyncio.create_task(maybe_refetch_autoplay(
                 chat_id,
                 {
@@ -74,27 +80,7 @@ async def put_queue(
             ))
     except Exception as e:
         pass
-        
-    # --- AUTOPLAY TRIGGER (Added to fetch songs automatically) ---
-    try:
-        from AxiomMusic.utils.database import is_autoplay
-        from AxiomMusic.utils.stream.autoplay import maybe_refetch_autoplay
-        
-        if await is_autoplay(chat_id):
-            asyncio.create_task(maybe_refetch_autoplay(
-                chat_id, 
-                {
-                    "chat_id": chat_id, 
-                    "user_id": user_id, 
-                    "streamtype": stream, 
-                    "vidid": vidid, 
-                    "title": title, 
-                    "by": user
-                }
-            ))
-    except Exception:
-        pass
-        
+
 
 async def put_queue_index(
     chat_id,
@@ -104,6 +90,7 @@ async def put_queue_index(
     duration,
     user,
     vidid,
+    user_id,
     stream,
     forceplay: Union[bool, str] = None,
 ):
@@ -118,11 +105,13 @@ async def put_queue_index(
             dur = 0
     else:
         dur = 0
+
     put = {
         "title": title,
         "dur": duration,
         "streamtype": stream,
         "by": user,
+        "user_id": user_id,
         "chat_id": original_chat_id,
         "file": file,
         "vidid": vidid,
@@ -139,20 +128,22 @@ async def put_queue_index(
     else:
         db[chat_id].append(put)
 
-    # --- AUTOPLAY TRIGGER for Index streams too ---
+    # ==========================================
+    # AUTOPLAY TRIGGER for Index streams too
+    # ==========================================
     try:
-        from AxiomMusic.utils.database import is_autoplay
-        from AxiomMusic.utils.stream.autoplay import maybe_refetch_autoplay
+        from AxiomMuzic.utils.database import is_autoplay
+        from AxiomMuzic.utils.stream.autoplay import maybe_refetch_autoplay
         
         if await is_autoplay(chat_id):
             asyncio.create_task(maybe_refetch_autoplay(
-                chat_id, 
+                chat_id,
                 {
-                    "chat_id": chat_id, 
-                    "user_id": user_id, 
-                    "streamtype": stream, 
-                    "vidid": vidid, 
-                    "title": title, 
+                    "chat_id": original_chat_id,
+                    "user_id": user_id,
+                    "streamtype": stream,
+                    "vidid": vidid,
+                    "title": title,
                     "by": user
                 }
             ))
