@@ -14,6 +14,7 @@
 import random
 from typing import Union
 from pyrogram import filters, types
+from pyrogram.enums import ButtonStyle
 from pyrogram.types import InlineKeyboardMarkup, Message, InlineKeyboardButton
 from AxiomMuzic import app
 from AxiomMuzic.utils import help_pannel
@@ -131,7 +132,7 @@ async def on_back_button(client, CallbackQuery):
 async def mb_plugin_button(client, CallbackQuery):
     callback_data = CallbackQuery.data.strip()
     cb = callback_data.split(None, 1)[1]
-    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("ʙᴀᴄᴋ", callback_data=f"mbot_cb")]])
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("ʙᴀᴄᴋ", callback_data=f"mbot_cb", style=ButtonStyle.PRIMARY,)]])
     if cb == "Okieeeeee":
         await CallbackQuery.edit_message_text(f"`something errors`",reply_markup=keyboard,parse_mode=enums.ParseMode.MARKDOWN)
     else:
