@@ -3,15 +3,15 @@ from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus, ButtonStyle
 from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from AxiomMusic import app
-from AxiomMusic.misc import SUDOERS, db
-from AxiomMusic.utils.database import (
+from AxiomMuzic import app
+from AxiomMuzic.misc import SUDOERS, db
+from AxiomMuzic.utils.database import (
     autoplay_off, autoplay_on, is_autoplay,
     get_autoplay_lang, set_autoplay_lang,
     get_autoplay_mood, set_autoplay_mood
 )
-from AxiomMusic.utils.stream.autoplay import queue_autoplay_tracks, convert_to_special_font
-from AxiomMusic.utils.decorators.admins import ActualAdminCB, AdminActual
+from AxiomMuzic.utils.stream.autoplay import queue_autoplay_tracks, convert_to_special_font
+from AxiomMuzic.utils.decorators.admins import ActualAdminCB, AdminActual
 from config import BANNED_USERS
 
 AUTOPLAY_RE = re.compile(
@@ -253,7 +253,7 @@ async def autoplay_from_player_callback(_, callback_query: CallbackQuery, __):
 @app.on_callback_query(filters.regex(r"^back_to_player$") & ~BANNED_USERS)
 @ActualAdminCB
 async def back_to_player(_, callback_query: CallbackQuery, __):
-    from AxiomMusic.utils.inline.play import stream_markup
+    from AxiomMuzic.utils.inline.play import stream_markup
     
     chat_id = callback_query.message.chat.id
     
