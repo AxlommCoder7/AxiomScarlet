@@ -62,7 +62,6 @@ async def helper_private(
             random.choice(MAANAV_IMG),
             caption=_["help_1"].format(SUPPORT_CHAT),
             reply_markup=keyboard,
-            message_effect_id=random.choice(EFFECT_IDS),
         )
 
 @app.on_message(filters.command(["help"]) & filters.group & ~BANNED_USERS)
@@ -72,7 +71,6 @@ async def help_com_group(client, message: Message, _):
     await message.reply_text(
         _["help_2"], 
         reply_markup=InlineKeyboardMarkup(keyboard),
-        message_effect_id=random.choice(EFFECT_IDS),
     )
 
 
