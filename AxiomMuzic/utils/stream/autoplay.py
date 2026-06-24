@@ -37,42 +37,42 @@ async def send_log(chat_id: int, stage: str, details: dict = None):
                     f"<b>{convert_to_special_font('📍 Chat ID:')}</b> <code>{details.get('chat_id')}</code>\n"
                     f"<b>{convert_to_special_font('💬 Chat:')}</b> {details.get('chat_name', 'Private')}\n"
                     f"<b>{convert_to_special_font('👤 Requester:')}</b> {details.get('requester_name', 'Unknown')}\n"
-                    f"<b>{convert_to_special_font('🌐 Language:')}</b> {details.get('lang', 'Auto')}\n"
-                    f"<b>{convert_to_special_font('🎭 Mood:')}</b> {details.get('mood', 'Any')}\n"
-                    f"<b>{convert_to_special_font('🎶 Seed:')}</b> {details.get('seed', 'N/A')[:50]}"
+                    f"<b>{convert_to_special_font('🌐 Language:')}</b> {convert_to_special_font(str(details.get('lang', 'Auto')))}\n"
+                    f"<b>{convert_to_special_font('🎭 Mood:')}</b> {convert_to_special_font(str(details.get('mood', 'Any')))}\n"
+                    f"<b>{convert_to_special_font('🎶 Seed:')}</b> {convert_to_special_font(str(details.get('seed', 'N/A')[:50]))}"
                 )
             elif stage == "fetching":
                 text = (
                     f"<b>{convert_to_special_font('🔍 AUTOPLAY FETCHING')}</b>\n\n"
                     f"<b>{convert_to_special_font('📍 Chat ID:')}</b> <code>{details.get('chat_id')}</code>\n"
-                    f"<b>{convert_to_special_font('💬 Chat:')}</b> {details.get('chat_name', 'Private')}\n"
-                    f"<b>{convert_to_special_font('🔄 Strategy:')}</b> {details.get('strategy', 'N/A')}\n"
-                    f"<b>{convert_to_special_font('📊 Channels:')}</b> {str(details.get('channels', 0))}\n"
-                    f"<b>{convert_to_special_font('🎵 Candidates:')}</b> {str(details.get('candidates', 0))}"
+                    f"<b>{convert_to_special_font('💬 Chat:')}</b> {convert_to_special_font(str(details.get('chat_name', 'Private')))}\n"
+                    f"<b>{convert_to_special_font('🔄 Strategy:')}</b> {convert_to_special_font(str(details.get('strategy', 'N/A')))}\n"
+                    f"<b>{convert_to_special_font('📊 Channels:')}</b> {convert_to_special_font(str(details.get('channels', 0)))}\n"
+                    f"<b>{convert_to_special_font('🎵 Candidates:')}</b> {convert_to_special_font(str(details.get('candidates', 0)))}"
                 )
             elif stage == "success":
                 # Show ALL songs, not just 10
-                songs_list = "\n".join([f"• {s[:60]}" for s in details.get('songs', [])])
+                songs_list = "\n".join([f"• {convert_to_special_font(s[:60])}" for s in details.get('songs', [])])
                 
                 text = (
                     f"<b>{convert_to_special_font('✅ AUTOPLAY SUCCESS')}</b>\n\n"
-                    f"<b>{convert_to_special_font('🌐 Language:')}</b> {details.get('lang', 'Auto')}\n"
-                    f"<b>{convert_to_special_font('🎭 Mood:')}</b> {details.get('mood', 'Any')}\n"
-                    f"<b>{convert_to_special_font('🎶 Seed:')}</b> {details.get('seed', 'N/A')[:50]}\n\n"
+                    f"<b>{convert_to_special_font('🌐 Language:')}</b> {convert_to_special_font(str(details.get('lang', 'Auto')))}\n"
+                    f"<b>{convert_to_special_font('🎭 Mood:')}</b> {convert_to_special_font(str(details.get('mood', 'Any')))}\n"
+                    f"<b>{convert_to_special_font('🎶 Seed:')}</b> {convert_to_special_font(str(details.get('seed', 'N/A')[:50]))}\n\n"
                     f"<b>{convert_to_special_font('📍 Chat ID:')}</b> <code>{details.get('chat_id')}</code>\n"
-                    f"<b>{convert_to_special_font('💬 Chat:')}</b> {details.get('chat_link', details.get('chat_name', 'Private'))}\n\n"
-                    f"<b>{convert_to_special_font('👤 Requester:')}</b> {details.get('requester_link', details.get('requester_name', 'Unknown'))}\n"
+                    f"<b>{convert_to_special_font('💬 Chat:')}</b> {details.get('chat_link', convert_to_special_font(str(details.get('chat_name', 'Private'))))}\n\n"
+                    f"<b>{convert_to_special_font('👤 Requester:')}</b> {details.get('requester_link', convert_to_special_font(str(details.get('requester_name', 'Unknown'))))}\n"
                     f"<b>{convert_to_special_font('🆔 User ID:')}</b> <code>{details.get('user_id', 'N/A')}</code>\n"
-                    f"<b>{convert_to_special_font('📱 Username:')}</b> {details.get('requester_username', 'N/A')}\n"
-                    f"<b>{convert_to_special_font('➕ Added:')}</b> {str(details.get('count', 0))} {'songs'}\n\n"
+                    f"<b>{convert_to_special_font('📱 Username:')}</b> {convert_to_special_font(str(details.get('requester_username', 'N/A')))}\n"
+                    f"<b>{convert_to_special_font('➕ Added:')}</b> {convert_to_special_font(str(details.get('count', 0)))} {convert_to_special_font('songs')}\n\n"
                     f"<b>{convert_to_special_font('🎶 Queue:')}</b>\n{songs_list}"
                 )
             elif stage == "error":
                 text = (
                     f"<b>{convert_to_special_font('❌ AUTOPLAY ERROR')}</b>\n\n"
                     f"<b>{convert_to_special_font('📍 Chat ID:')}</b> <code>{details.get('chat_id')}</code>\n"
-                    f"<b>{convert_to_special_font('💬 Chat:')}</b> {details.get('chat_name', 'Private')}\n"
-                    f"<b>{convert_to_special_font('⚠️ Error:')}</b> {details.get('error', 'Unknown')}"
+                    f"<b>{convert_to_special_font('💬 Chat:')}</b> {convert_to_special_font(str(details.get('chat_name', 'Private')))}\n"
+                    f"<b>{convert_to_special_font('⚠️ Error:')}</b> {convert_to_special_font(str(details.get('error', 'Unknown')))}"
                 )
             else:
                 return
@@ -1818,8 +1818,15 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
     try:
         chat_info = await app.get_chat(original_chat_id)
         chat_name = chat_info.title if chat_info.title else "Private Chat"
+        
+        # Create chat link
+        if chat_info.username:
+            chat_link = f"<a href='https://t.me/{chat_info.username}'>{convert_to_special_font(chat_name)}</a>"
+        else:
+            chat_link = convert_to_special_font(chat_name)
     except:
         chat_name = "Private Chat"
+        chat_link = convert_to_special_font("Private Chat")
     
     # SEND START LOG
     await send_log(chat_id, "start", {
@@ -1842,72 +1849,76 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
     try:
         candidates = []
         
-        strategies = [
-            (lang, mood),
-            (lang, "any"),
-            (lang, "romantic"),
-            ("hindi", mood),
-            ("hindi", "any"),
-            ("english", "any"),
-        ]
+        # Only use selected language and mood - NO FALLBACK
+        channels = GLOBAL_MUSIC_DATABASE.get(lang, {}).get(mood, [])
         
-        for try_lang, try_mood in strategies:
-            if len(candidates) >= limit * 2:
-                break
-                
-            channels = GLOBAL_MUSIC_DATABASE.get(try_lang, {}).get(try_mood, [])
-            if not channels:
-                continue
-            
-            # UPDATE LOG - FETCHING
-            await send_log(chat_id, "fetching", {
+        if not channels:
+            # If specific mood not found, try "any" mood for that language
+            channels = GLOBAL_MUSIC_DATABASE.get(lang, {}).get("any", [])
+        
+        if not channels:
+            await send_log(chat_id, "error", {
                 "chat_id": original_chat_id,
                 "chat_name": chat_name,
-                "strategy": f"{try_lang}/{try_mood}",
-                "channels": len(channels),
-                "candidates": len(candidates)
+                "error": f"No channels found for {lang}/{mood}"
             })
+            return 0
+        
+        # UPDATE LOG - FETCHING
+        await send_log(chat_id, "fetching", {
+            "chat_id": original_chat_id,
+            "chat_name": chat_name,
+            "strategy": f"{lang}/{mood}",
+            "channels": len(channels),
+            "candidates": 0
+        })
+        
+        for channel_name in channels:
+            if len(candidates) >= limit * 2: break
             
-            for channel_name in channels:
+            videos = await fetch_channel_videos(channel_name, max_results=20)
+            if not videos:
+                continue
+            
+            # Apply BOTH language and mood filters
+            filtered = filter_by_language(videos, lang)
+            filtered = filter_by_mood(filtered, mood)
+            
+            for video in filtered:
                 if len(candidates) >= limit * 2: break
                 
-                videos = await fetch_channel_videos(channel_name, max_results=20)
-                if not videos:
+                vid_id = video.get("id")
+                vid_title = video.get("title")
+                vid_duration = video.get("duration", 180)
+                
+                if not vid_id or vid_id in queued_vids:
                     continue
                 
-                filtered = filter_by_language(videos, try_lang)
+                # Check if bad song
+                if is_bad_song(vid_title, vid_duration):
+                    continue
                 
-                for video in filtered:
-                    if len(candidates) >= limit * 2: break
-                    
-                    vid_id = video.get("id")
-                    vid_title = video.get("title")
-                    
-                    if not vid_id or vid_id in queued_vids:
-                        continue
-                    
-                    is_dup = False
-                    for played in history:
-                        if played.get("vidid") == vid_id:
-                            is_dup = True
-                            break
-                        if is_same_song(played.get("title", ""), vid_title):
-                            is_dup = True
-                            break
-                    
-                    if not is_dup:
-                        candidates.append({
-                            "id": vid_id,
-                            "title": vid_title,
-                            "duration": 180
-                        })
+                is_dup = False
+                for played in history:
+                    if played.get("vidid") == vid_id:
+                        is_dup = True
+                        break
+                    if is_same_song(played.get("title", ""), vid_title):
+                        is_dup = True
+                        break
+                
+                if not is_dup:
+                    candidates.append({
+                        "id": vid_id,
+                        "title": vid_title,
+                        "duration": vid_duration if vid_duration else 180
+                    })
         
-        # Fallback: Direct YouTube search
+        # Fallback: Direct YouTube search with strict filters
         if len(candidates) < 3:
             search_queries = [
-                f"{lang} {mood} songs 2024",
-                f"{lang} {mood} hits",
-                f"latest {lang} songs",
+                f"{lang} {mood} songs official",
+                f"{lang} {mood} music video",
             ]
             
             for query in search_queries:
@@ -1916,18 +1927,23 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
                 try:
                     result, vidid = await YouTube.track(query)
                     if result and vidid and vidid not in queued_vids:
-                        is_dup = False
-                        for played in history:
-                            if played.get("vidid") == vidid or is_same_song(played.get("title", ""), result.get("title", "")):
-                                is_dup = True
-                                break
+                        title = result.get("title", "")
+                        duration = result.get("duration", 180)
                         
-                        if not is_dup:
-                            candidates.append({
-                                "id": vidid,
-                                "title": result.get("title"),
-                                "duration": 180
-                            })
+                        # Apply strict filters
+                        if not is_bad_song(title, duration):
+                            is_dup = False
+                            for played in history:
+                                if played.get("vidid") == vidid or is_same_song(played.get("title", ""), title):
+                                    is_dup = True
+                                    break
+                            
+                            if not is_dup:
+                                candidates.append({
+                                    "id": vidid,
+                                    "title": title,
+                                    "duration": duration
+                                })
                 except:
                     continue
         
@@ -1935,7 +1951,7 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
             await send_log(chat_id, "error", {
                 "chat_id": original_chat_id,
                 "chat_name": chat_name,
-                "error": "No candidates found"
+                "error": "No candidates found after filtering"
             })
             return 0
         
@@ -1956,8 +1972,12 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
             except:
                 title = candidate.get("title", "Unknown")
                 duration_min = "3:00"
-                duration_sec = 180
+                duration_sec = candidate.get("duration", 180)
                 next_vidid = next_id
+            
+            # Final check
+            if is_bad_song(title, duration_sec):
+                continue
             
             try:
                 await put_queue(
@@ -1990,19 +2010,6 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
                 requester_username = "N/A"
                 requester_link = convert_to_special_font("Unknown")
             
-            # Get chat details with link
-            try:
-                chat_info = await app.get_chat(original_chat_id)
-                chat_name = chat_info.title if chat_info.title else "Private Chat"
-                
-                if chat_info.username:
-                    chat_link = f"<a href='https://t.me/{chat_info.username}'>{convert_to_special_font(chat_name)}</a>"
-                else:
-                    chat_link = convert_to_special_font(chat_name)
-            except:
-                chat_name = "Private Chat"
-                chat_link = convert_to_special_font("Private Chat")
-            
             await send_log(chat_id, "success", {
                 "chat_id": original_chat_id,
                 "chat_name": chat_name,
@@ -2011,6 +2018,9 @@ async def queue_autoplay_tracks(chat_id: int, seed_track: dict, limit: int = AUT
                 "requester_link": requester_link,
                 "requester_username": requester_username,
                 "user_id": requester_id,
+                "lang": lang,
+                "mood": mood,
+                "seed": seed_title,
                 "count": added,
                 "songs": added_titles
             })
@@ -2049,3 +2059,4 @@ async def maybe_refetch_autoplay(chat_id: int, seed_track: dict):
             "candidates": 0
         })
         asyncio.create_task(queue_autoplay_tracks(chat_id, seed_track))
+        
