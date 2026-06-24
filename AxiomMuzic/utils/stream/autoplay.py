@@ -2,10 +2,10 @@ import asyncio
 import random
 import re
 import config
-from AxiomMusic import LOGGER, YouTube, app
-from AxiomMusic.misc import db
-from AxiomMusic.utils.database import is_autoplay, get_autoplay_lang, get_autoplay_mood, set_autoplay_lang, set_autoplay_mood
-from AxiomMusic.utils.stream.queue import put_queue
+from AxiomMuzic import LOGGER, YouTube, app
+from AxiomMuzic.misc import db
+from AxiomMuzic.utils.database import is_autoplay, get_autoplay_lang, get_autoplay_mood, set_autoplay_lang, set_autoplay_mood
+from AxiomMuzic.utils.stream.queue import put_queue
 from py_yt import VideosSearch
 from config import LOGGER_ID
 
