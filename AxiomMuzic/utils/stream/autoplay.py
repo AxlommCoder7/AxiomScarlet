@@ -1891,12 +1891,20 @@ async def maybe_refetch_autoplay(chat_id: int, seed_track: dict):
     if not seed_track: return
     current_queue = len(db.get(chat_id, []))
     if current_queue <= AUTOPLAY_REFETCH_THRESHOLD:
-        await send_log(f"🔄 Trigger AutoPlay - Queue: {current_queue}")
-        asyncio.create_task(queue_autoplay_tracks(chat_id, seed_track))
-
-async def maybe_refetch_autoplay(chat_id: int, seed_track: dict):
-    if not seed_track: return
-    current_queue = len(db.get(chat_id, []))
-    if current_queue <= AUTOPLAY_REFETCH_THRESHOLD:
-        await send_log(f"🔄 <b>Trigger AutoPlay</b> - Queue: <b>{current_queue}</b>")
+        original_chat_id = seed_track.get("chat_id", chat_id)
+        
+        # Get chat info
+        try:
+            chat_info = await app.get_chat(original_chat_id)
+            chat_name = chat_info.title if chat_info.title else "Private Chat"
+        except:
+            chat_name = "Private Chat"
+        
+        await send_log(chat_id, "fetching", {
+            "chat_id": original_chat_id,
+            "chat_name": chat_name,
+            "strategy": f"Auto Refetch (Queue: {current_queue})",
+            "channels": 0,
+            "candidates": 0
+        })
         asyncio.create_task(queue_autoplay_tracks(chat_id, seed_track))
