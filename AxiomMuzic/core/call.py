@@ -42,21 +42,21 @@ counter = {}
 
 async def _clear_(chat_id: int):
     # Animation task cancel kar
-    if chat_id in db and len(db[chat_id]) > 0:
-        if "animation_task" in db[chat_id][0]:
-            try:
-                task = db[chat_id][0]["animation_task"]
-                if not task.done():
-                    task.cancel()
-                    print(f"✅ Animation task cancelled for chat {chat_id}")
-                    try:
-                        await asyncio.wait_for(task, timeout=2.0)
-                    except asyncio.CancelledError:
-                        print(f"✅ Task successfully cancelled")
-                    except asyncio.TimeoutError:
-                        print(f"⚠️ Task cancellation timeout")
-            except Exception as e:
-                print(f"❌ Error cancelling task: {e}")
+    # if chat_id in db and len(db[chat_id]) > 0:
+    #     if "animation_task" in db[chat_id][0]:
+    #         try:
+    #             task = db[chat_id][0]["animation_task"]
+    #             if not task.done():
+    #                 task.cancel()
+    #                 print(f"✅ Animation task cancelled for chat {chat_id}")
+    #                 try:
+    #                     await asyncio.wait_for(task, timeout=2.0)
+    #                 except asyncio.CancelledError:
+    #                     print(f"✅ Task successfully cancelled")
+    #                 except asyncio.TimeoutError:
+    #                     print(f"⚠️ Task cancellation timeout")
+    #         except Exception as e:
+    #             print(f"❌ Error cancelling task: {e}")
         
         # Thumbnail message delete kar
         if "mystic" in db[chat_id][0]:
