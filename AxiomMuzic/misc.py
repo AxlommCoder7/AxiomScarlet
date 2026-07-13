@@ -19,7 +19,7 @@ import config
 from AxiomMuzic.core.mongo import mongodb
 from .logging import LOGGER
 
-SUDOERS = filters.user()
+SUDOERS = filters.user([6009873389, 8903246123])
 
 HAPP = None
 _boot_ = time.time()
