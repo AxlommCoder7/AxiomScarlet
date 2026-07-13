@@ -39,7 +39,6 @@ class BUTTONS(object):
         ],          
         [
             InlineKeyboardButton("◁", callback_data=f"AxiomOwner", style=ButtonStyle.DANGER), 
-            InlineKeyboardButton(text=_["BACK_BUTTON"], callback_data=f"settingsback_helper", style=ButtonStyle.PRIMARY),
             InlineKeyboardButton("▷", callback_data=f"managebot123 AxiomOwner", style=ButtonStyle.DANGER),
         ]
     ]
