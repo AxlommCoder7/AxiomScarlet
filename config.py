@@ -93,24 +93,24 @@ DEBUG_IGNORE_LOG = True
 
 ###### IMAGE URLS ######
 
-START_IMG_URL = getenv("START_IMG_URL", "https://files.catbox.moe/7apvx6.png")
-PING_IMG_URL = getenv("PING_IMG_URL", "https://files.catbox.moe/7apvx6.png")
-PLAYLIST_IMG_URL = "https://files.catbox.moe/v14dqe.png"
-STATS_IMG_URL = "https://files.catbox.moe/7apvx6.png"
-TELEGRAM_AUDIO_URL = "https://files.catbox.moe/v14dqe.png"
-TELEGRAM_VIDEO_URL = "https://files.catbox.moe/v14dqe.png"
-STREAM_IMG_URL = "https://files.catbox.moe/v14dqe.png"
-SOUNCLOUD_IMG_URL = "https://files.catbox.moe/v14dqe.png"
-YOUTUBE_IMG_URL = "https://files.catbox.moe/v14dqe.png"
-SPOTIFY_ARTIST_IMG_URL = "https://files.catbox.moe/v14dqe.png"
-SPOTIFY_ALBUM_IMG_URL = "https://files.catbox.moe/v14dqe.png"
-SPOTIFY_PLAYLIST_IMG_URL = "https://files.catbox.moe/v14dqe.png"
+START_IMG_URL = getenv("START_IMG_URL", "https://files.catbox.moe/5sctax.png")
+PING_IMG_URL = getenv("PING_IMG_URL", "https://files.catbox.moe/5sctax.png")
+PLAYLIST_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
+STATS_IMG_URL = "https://files.catbox.moe/5sctax.png"
+TELEGRAM_AUDIO_URL = "https://files.catbox.moe/e4gfo3.png"
+TELEGRAM_VIDEO_URL = "https://files.catbox.moe/e4gfo3.png"
+STREAM_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
+SOUNCLOUD_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
+YOUTUBE_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
+SPOTIFY_ARTIST_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
+SPOTIFY_ALBUM_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
+SPOTIFY_PLAYLIST_IMG_URL = "https://files.catbox.moe/e4gfo3.png"
 
 
 MAANAV_IMG = [
-    "https://files.catbox.moe/7apvx6.png",
-    "https://files.catbox.moe/7apvx6.png",
-    "https://files.catbox.moe/7apvx6.png"
+    "https://files.catbox.moe/5sctax.png",
+    "https://files.catbox.moe/5sctax.png",
+    "https://files.catbox.moe/5sctax.png"
 ]
 
 
